@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name = "tipoUsuario">
+        <item>-Tipo de usuário-</item>
+        <item>Agente</item>
+        <item>Idoso</item>
+        <item>Pessoa com deficiência</item>
+        <item>Voluntário</item>
+    </string-array>
+
+    <string-array name = "tipoAgente">
+        <item>-Categoria de Agente-</item>
+        <item>Agente de Defesa Civil</item>
+        <item>Agente de saúde</item>
+        <item>Guarda Municipal</item>
+        <item>Policial Militar</item>
+        <item>Bombeiro</item>
+    </string-array>
+
+    <string-array name = "tipoPCD">
+        <item>-Tipo de Deficiência-</item>
+        <item>Mental</item>
+        <item>Audição</item>
+        <item>Motora</item>
+        <item>Visual</item>
+        <item>Cadeirante</item>
+    </string-array>
+
+
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name = "pae">
+
+        <item>Selecione uma opção</item>
+        <item>Sozinho em local com pouca iluminação</item>
+        <item>Mal estar/ Mal súbito</item>
+        <item>Falta de mobilidade</item>
+        <item>Perda de memória</item>
+        <item>Retirada de lugar com alagamento</item>
+
+    </string-array>
+</resources>

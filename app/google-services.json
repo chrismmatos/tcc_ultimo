@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1025577202116",
+    "firebase_url": "https://tccfirebaseproject-99c26.firebaseio.com",
+    "project_id": "tccfirebaseproject-99c26",
+    "storage_bucket": "tccfirebaseproject-99c26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1025577202116:android:068f4d296cd4d179",
+        "android_client_info": {
+          "package_name": "com.example.christian.tcc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1025577202116-54g3j483qr20in0tuc6bgbdkvakpaf0a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.christian.tcc",
+            "certificate_hash": "94a4ec65c00cb37657b60f9f89ef7701b0e0a40b"
+          }
+        },
+        {
+          "client_id": "1025577202116-90in1qqkjmhh4laiuo0h06507rf89q6v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLgDSb0UxAEogDao_kbUOq8MqS06g1PL4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1025577202116-90in1qqkjmhh4laiuo0h06507rf89q6v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
