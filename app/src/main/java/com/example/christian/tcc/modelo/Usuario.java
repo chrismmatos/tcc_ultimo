@@ -105,5 +105,4 @@ public class Usuario implements Serializable {
         this.distancia = distancia;
     }
 
-
 }

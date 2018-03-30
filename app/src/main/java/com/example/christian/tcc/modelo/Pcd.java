@@ -7,21 +7,21 @@ import java.util.Map;
  * Created by christian on 11/03/2018.
  */
 
-public class Agente {
+public class Pcd {
     private Integer id;
     private Integer idLogado = 0;
     private String nome;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
-    private String tipoAgente = "";
+    private String tipoPcd = "";
 
-    public Agente() {}
+    public Pcd() {}
 
 
-    public Agente(Integer id,  String nome, String tipoAgente) {
+    public Pcd(Integer id,  String nome, String tipoAgente) {
         this.id = id;
         this.nome = nome;
-        this.tipoAgente = tipoAgente;
+        this.tipoPcd = tipoAgente;
     }
 
     public Integer getId() {
@@ -65,11 +65,11 @@ public class Agente {
     }
 
     public String getTipoAgente() {
-        return tipoAgente;
+        return tipoPcd;
     }
 
     public void setTipoAgente(String tipoAgente) {
-        this.tipoAgente = tipoAgente;
+        this.tipoPcd = tipoAgente;
     }
 
     public Map<String, Object> toMap(){
@@ -77,10 +77,11 @@ public class Agente {
         result.put("id",id);
         result.put("idLogado",idLogado);
         result.put("nome",nome);
-        result.put("tipoAgente",tipoAgente);
+        result.put("tipoPcd",tipoPcd);
         result.put("latitude",latitude);
         result.put("longitude",longitude);
 
         return  result;
     }
 }
+

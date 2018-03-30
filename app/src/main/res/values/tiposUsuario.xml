@@ -22,7 +22,7 @@
     <string-array name = "tipoPCD">
         <item>-Tipo de Deficiência-</item>
         <item>Mental</item>
-        <item>Audição</item>
+        <item>Auditiva</item>
         <item>Motora</item>
         <item>Visual</item>
         <item>Cadeirante</item>

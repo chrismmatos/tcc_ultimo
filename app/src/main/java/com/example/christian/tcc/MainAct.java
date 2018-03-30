@@ -56,7 +56,7 @@ public class MainAct extends AppCompatActivity{
 
     private List<Usuario> listUsuarios = new ArrayList<>();
 
-    static DatabaseReference mRootRef;
+    public static DatabaseReference mRootRef;
 
     Button btnGps;
     TextView txtLatitude, txtLongitude;
@@ -94,8 +94,8 @@ public class MainAct extends AppCompatActivity{
 
         //Usuarios de teste ************
 
-        writeNewUser(2,"a");
-        writeNewUser(3,"b");
+        //writeNewUser(2,"a");
+        //writeNewUser(3,"b");
 
 
         DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("users");

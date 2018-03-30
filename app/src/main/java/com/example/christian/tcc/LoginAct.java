@@ -25,25 +25,37 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.christian.tcc.modelo.Agente;
+import com.example.christian.tcc.modelo.Idoso;
+import com.example.christian.tcc.modelo.Pcd;
+import com.example.christian.tcc.modelo.Usuario;
+import com.example.christian.tcc.modelo.Voluntario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static com.example.christian.tcc.MainAct.mRootRef;
 
 /**
  * A login screen that offers login via email/password.
@@ -52,10 +64,20 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    EditText edtNome;
+    Spinner spnTipoAgente;
+    Spinner spnTipoPcd;
+    Spinner spnTipoUsuario;
+    String tipoUsuario;
+    String tipoAgente;
+    String tipoPCD;
+
+
     private FirebaseAuth mAuth;
 
     String email;
     String password;
+    String nomeUsuario;
 
 
     /**
@@ -85,6 +107,11 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_login);
+
+        edtNome = findViewById(R.id.txt_edt_nome);
+        spnTipoAgente = findViewById(R.id.spinner_tipo_agente);
+        spnTipoPcd = findViewById(R.id.spinner_tipo_pcd);
+        spnTipoUsuario = findViewById(R.id.spinnerTipoUsuario);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -224,11 +251,43 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                 findViewById(R.id.includeRegistro).setVisibility(View.VISIBLE);
 
                 Button btnConcluir = findViewById(R.id.btn_concluir);
+
                 btnConcluir.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         findViewById(R.id.includeLogin).setVisibility(View.VISIBLE);
                         findViewById(R.id.includeRegistro).setVisibility(View.INVISIBLE);
+
+                        nomeUsuario = edtNome.getText().toString();
+
+                        switch (tipoUsuario){
+
+                            case "Agente": {
+                                tipoAgente = spnTipoAgente.getSelectedItem().toString();
+                                writeNewAgente(1,nomeUsuario,tipoAgente);
+                                break;
+                            }
+
+                            case "Pessoa com deficiência":{
+                                tipoPCD = spnTipoPcd.getSelectedItem().toString();
+                                writeNewPCD(1,nomeUsuario,tipoPCD);
+                                break;
+                            }
+
+                            case "Idoso":{
+                                writeNewIdoso(1,nomeUsuario);
+                                break;
+                            }
+
+                            case "Voluntário":{
+                                writeNewVoluntario(1, nomeUsuario);
+                                break;
+                            }
+
+                            default: break;
+
+                        }
+
                         showProgress(true);
                         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(LoginAct.this, new OnCompleteListener<AuthResult>() {
                             @Override
@@ -250,7 +309,35 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                     }
                 });
 
+                spnTipoUsuario.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        spnTipoAgente.setVisibility(View.INVISIBLE);
+                        spnTipoPcd.setVisibility(View.INVISIBLE);
 
+                        tipoUsuario = spnTipoUsuario.getSelectedItem().toString();
+
+                        switch (tipoUsuario){
+
+                            case "Agente": {
+                                spnTipoAgente.setVisibility(View.VISIBLE);
+                                break;
+                            }
+
+                            case "Pessoa com deficiência":{
+                                spnTipoPcd.setVisibility(View.VISIBLE);
+                                break;
+                            }
+
+                            default: break;
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
 
             }
             else {
@@ -434,6 +521,33 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
         }
     }
 
+    public static void writeNewAgente(Integer id,  String nome, String tipoAgente) {
+        Agente agente = new Agente(id,nome,tipoAgente);
+        Map<String, Object> postValues = agente.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        mRootRef.child("usuarios/agentes/"+id).setValue(agente);
+    }
+
+    public static void writeNewPCD(Integer id,  String nome, String tipoPCD) {
+        Pcd pcd = new Pcd(id,nome,tipoPCD);
+        Map<String, Object> postValues = pcd.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        mRootRef.child("usuarios/pcds/"+id).setValue(pcd);
+    }
+
+    public static void writeNewVoluntario(Integer id,  String nome) {
+        Voluntario voluntario = new Voluntario(id,nome);
+        Map<String, Object> postValues = voluntario.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        mRootRef.child("usuarios/voluntarios/"+id).setValue(voluntario);
+    }
+
+    public static void writeNewIdoso(Integer id,  String nome) {
+        Idoso idoso = new Idoso(id,nome);
+        Map<String, Object> postValues = idoso.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        mRootRef.child("usuarios/idosos/"+id).setValue(idoso);
+    }
 
 }
 

@@ -4,24 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by christian on 11/03/2018.
+ * Created by christian on 30/03/2018.
  */
 
-public class Agente {
+public class Idoso {
+
     private Integer id;
     private Integer idLogado = 0;
     private String nome;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
-    private String tipoAgente = "";
 
-    public Agente() {}
+    public Idoso() {}
 
 
-    public Agente(Integer id,  String nome, String tipoAgente) {
+    public Idoso(Integer id,  String nome) {
         this.id = id;
         this.nome = nome;
-        this.tipoAgente = tipoAgente;
     }
 
     public Integer getId() {
@@ -64,20 +63,12 @@ public class Agente {
         this.longitude = longitude;
     }
 
-    public String getTipoAgente() {
-        return tipoAgente;
-    }
-
-    public void setTipoAgente(String tipoAgente) {
-        this.tipoAgente = tipoAgente;
-    }
 
     public Map<String, Object> toMap(){
         HashMap<String,Object> result = new HashMap<>();
         result.put("id",id);
         result.put("idLogado",idLogado);
         result.put("nome",nome);
-        result.put("tipoAgente",tipoAgente);
         result.put("latitude",latitude);
         result.put("longitude",longitude);
 
