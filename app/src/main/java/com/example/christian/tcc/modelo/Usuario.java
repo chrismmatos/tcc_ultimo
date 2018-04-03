@@ -10,67 +10,42 @@ import java.util.Map;
 
 
 public class Usuario implements Serializable {
-    private Integer id = 0;
     private Integer idLogado = 0;
     private String tipoUsuario = "";
     private String tipoAgente = "";
     private String tipoPCD = "";
+    private String nome = "";
+    private String email = "";
+    private Integer numPas = 0;
 
-    public String getTipoAgente() {
-        return tipoAgente;
-    }
 
-    public void setTipoAgente(String tipoAgente) {
-        this.tipoAgente = tipoAgente;
-    }
-
-    public String getTipoPCD() {
-        return tipoPCD;
-    }
-
-    public void setTipoPCD(String tipoPCD) {
-        this.tipoPCD = tipoPCD;
-    }
-
-    private Integer tempo = 2;
-    private Integer distancia = 1000;
-
-    public Usuario(Integer idUsuarioLogado, String tipoUsuario) {
-        this.idLogado = idUsuarioLogado;
-        this.tipoUsuario = tipoUsuario;
-    }
-
-    public Usuario(Integer id, Integer idLogado, String tipoUsuario, Integer tempo, Integer distancia) {
-        this.id = id;
-        this.idLogado = idLogado;
-        this.tipoUsuario = tipoUsuario;
-        this.tempo = tempo;
-        this.distancia = distancia;
-    }
 
     public Usuario(){}
 
-    public Map <String, Object> toMap(){
-        HashMap<String,Object> result = new HashMap<>();
-        result.put("id",id);
-        result.put("idLogado",idLogado);
-        result.put("tipoUsuario",tipoUsuario);
-        result.put("tempo",tempo);
-        result.put("distancia",distancia);
-        result.put("tipoAgente",tipoAgente);
-        result.put("tipoPCD",tipoPCD);
+    public Usuario(String tipoUsuario, String tipoAgentePCD, String nome, String email) {
+        this.tipoUsuario = tipoUsuario;
+        this.nome = nome;
+        this.email = email;
 
-        return  result;
+        switch (tipoUsuario){
+
+            case "Pessoa com deficiência":{
+                tipoPCD = tipoAgentePCD;
+                break;
+            }
+            case "Agente":{
+                tipoAgente = tipoAgentePCD;
+                break;
+            }
+            default:
+                break;
+        }
     }
 
-    // Getters e Setters...
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public Usuario(String tipoUsuario, String nome, String email) {
+        this.tipoUsuario = tipoUsuario;
+        this.nome = nome;
+        this.email = email;
     }
 
     public Integer getIdLogado() {
@@ -89,20 +64,58 @@ public class Usuario implements Serializable {
         this.tipoUsuario = tipoUsuario;
     }
 
-    public Integer getTempo() {
-        return tempo;
+    public String getTipoAgente() {
+        return tipoAgente;
     }
 
-    public void setTempo(Integer tempo) {
-        this.tempo = tempo;
+    public void setTipoAgente(String tipoAgente) {
+        this.tipoAgente = tipoAgente;
     }
 
-    public Integer getDistancia() {
-        return distancia;
+    public String getTipoPCD() {
+        return tipoPCD;
     }
 
-    public void setDistancia(Integer distancia) {
-        this.distancia = distancia;
+    public void setTipoPCD(String tipoPCD) {
+        this.tipoPCD = tipoPCD;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Integer getNumPas() {
+        return numPas;
+    }
+
+    public void setNumPas(Integer numPas) {
+        this.numPas = numPas;
+    }
+
+    public Map <String, Object> toMap(){
+        HashMap<String,Object> result = new HashMap<>();
+        result.put("idLogado",idLogado);
+        result.put("tipoUsuario",tipoUsuario);
+        result.put("nome",nome);
+        result.put("email",email);
+        result.put("tipoAgente",tipoAgente);
+        result.put("tipoPCD",tipoPCD);
+        result.put("numPas",numPas);
+
+        return  result;
+    }
+
 
 }

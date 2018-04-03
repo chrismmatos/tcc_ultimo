@@ -38,6 +38,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -66,6 +67,7 @@ public class MainAct extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
 
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mRootRef.keepSynced(true);
 
@@ -73,7 +75,34 @@ public class MainAct extends AppCompatActivity{
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            Toast.makeText(getApplicationContext(), "Bem vindo de volta " + user.getEmail() + "!", Toast.LENGTH_LONG).show();
+
+            Query query = mRootRef.child("usuarios").orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Usuario usuario = dataSnapshot.getValue(Usuario.class);
+
+                   switch (usuario.getTipoUsuario()){
+                       case "Pessoa com deficiência" : {
+                           startActivity(new Intent(MainAct.this, PdiMainActivity.class));
+                           break;
+                       }
+
+                       default:{
+                           Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuario.getEmail() + "!", Toast.LENGTH_LONG).show();
+                       }
+
+                   }
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    //Se ocorrer um erro
+                }
+            });
+
         } else {
             Intent intent = new Intent(this, LoginAct.class);
             startActivity(intent);
@@ -98,7 +127,7 @@ public class MainAct extends AppCompatActivity{
         //writeNewUser(3,"b");
 
 
-        DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("users");
+        DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("usuarios");
 
         refUsers.addValueEventListener(new ValueEventListener() {
 
@@ -203,20 +232,6 @@ public class MainAct extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
-
-    public static void writeNewUser(Integer idUsuarioLogado, String tipoUsuario) {
-
-        String key = mRootRef.child("users").push().getKey();
-        Usuario user = new Usuario (idUsuarioLogado,tipoUsuario);
-        Map<String, Object> postValues = user.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/users/" + key, postValues);
-
-        mRootRef.updateChildren(childUpdates);
-
-    }
-
 
 
 }

@@ -36,11 +36,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.christian.tcc.modelo.Agente;
-import com.example.christian.tcc.modelo.Idoso;
-import com.example.christian.tcc.modelo.Pcd;
 import com.example.christian.tcc.modelo.Usuario;
-import com.example.christian.tcc.modelo.Voluntario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -245,7 +241,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
 
-            if(isNewUser) {
+            if (isNewUser) {
 
                 findViewById(R.id.includeLogin).setVisibility(View.INVISIBLE);
                 findViewById(R.id.includeRegistro).setVisibility(View.VISIBLE);
@@ -260,31 +256,32 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                         nomeUsuario = edtNome.getText().toString();
 
-                        switch (tipoUsuario){
+                        switch (tipoUsuario) {
 
                             case "Agente": {
                                 tipoAgente = spnTipoAgente.getSelectedItem().toString();
-                                writeNewAgente(1,nomeUsuario,tipoAgente);
+                                writeNewAgenteOrPcd(email, nomeUsuario,tipoUsuario, tipoAgente);
                                 break;
                             }
 
-                            case "Pessoa com deficiência":{
+                            case "Pessoa com deficiência": {
                                 tipoPCD = spnTipoPcd.getSelectedItem().toString();
-                                writeNewPCD(1,nomeUsuario,tipoPCD);
+                                writeNewAgenteOrPcd(email, nomeUsuario,tipoUsuario, tipoPCD);
                                 break;
                             }
 
-                            case "Idoso":{
-                                writeNewIdoso(1,nomeUsuario);
+                            case "Idoso": {
+                                writeNewIdosoOrVoluntario(email,nomeUsuario,tipoUsuario);
                                 break;
                             }
 
-                            case "Voluntário":{
-                                writeNewVoluntario(1, nomeUsuario);
+                            case "Voluntário": {
+                                writeNewIdosoOrVoluntario(email,nomeUsuario,tipoUsuario);
                                 break;
                             }
 
-                            default: break;
+                            default:
+                                break;
 
                         }
 
@@ -317,19 +314,20 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                         tipoUsuario = spnTipoUsuario.getSelectedItem().toString();
 
-                        switch (tipoUsuario){
+                        switch (tipoUsuario) {
 
                             case "Agente": {
                                 spnTipoAgente.setVisibility(View.VISIBLE);
                                 break;
                             }
 
-                            case "Pessoa com deficiência":{
+                            case "Pessoa com deficiência": {
                                 spnTipoPcd.setVisibility(View.VISIBLE);
                                 break;
                             }
 
-                            default: break;
+                            default:
+                                break;
                         }
                     }
 
@@ -339,8 +337,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                     }
                 });
 
-            }
-            else {
+            } else {
                 showProgress(true);
                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginAct.this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -354,7 +351,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                             } else {
                                 Toast.makeText(getApplicationContext(), "Email e/ou senha incorretos.", Toast.LENGTH_LONG).show();
                             }
-                        }catch (Exception e ){
+                        } catch (Exception e) {
                             Toast.makeText(getApplicationContext(), "Email e/ou senha incorretos.", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -521,33 +518,52 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
         }
     }
 
-    public static void writeNewAgente(Integer id,  String nome, String tipoAgente) {
-        Agente agente = new Agente(id,nome,tipoAgente);
-        Map<String, Object> postValues = agente.toMap();
+
+    public static void writeNewIdosoOrVoluntario (String email,String nome, String tipoUsuario) {
+        Usuario usuario = new Usuario(email,nome,tipoUsuario);
+        Map<String, Object> postValues = usuario.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios/agentes/"+id).setValue(agente);
+        mRootRef.child("usuarios").push().setValue(usuario);
     }
 
-    public static void writeNewPCD(Integer id,  String nome, String tipoPCD) {
-        Pcd pcd = new Pcd(id,nome,tipoPCD);
-        Map<String, Object> postValues = pcd.toMap();
+    public static void writeNewAgenteOrPcd (String email,String nome, String tipoUsuario, String tipoPcdAgente) {
+        Usuario usuario = new Usuario(email,nome,tipoUsuario,tipoPcdAgente);
+        Map<String, Object> postValues = usuario.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios/pcds/"+id).setValue(pcd);
+        mRootRef.child("usuarios").push().setValue(usuario);
     }
 
-    public static void writeNewVoluntario(Integer id,  String nome) {
-        Voluntario voluntario = new Voluntario(id,nome);
-        Map<String, Object> postValues = voluntario.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios/voluntarios/"+id).setValue(voluntario);
-    }
 
-    public static void writeNewIdoso(Integer id,  String nome) {
-        Idoso idoso = new Idoso(id,nome);
-        Map<String, Object> postValues = idoso.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios/idosos/"+id).setValue(idoso);
-    }
+
+    //Cria Usuários
+
+//    public static void writeNewAgente(Integer id, String nome, String tipoAgente, String tipoUsuario, String email) {
+//        Agente agente = new Agente(id, nome, tipoAgente, tipoUsuario, email);
+//        Map<String, Object> postValues = agente.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        mRootRef.child("usuarios/agentes/").push().setValue(agente);
+//    }
+//
+//    public static void writeNewPCD(Integer id, String nome, String tipoPCD, String tipoUsuario, String email) {
+//        Pcd pcd = new Pcd(id, nome, tipoPCD, tipoUsuario, email);
+//        Map<String, Object> postValues = pcd.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        mRootRef.child("usuarios/pcds/").push().setValue(pcd);
+//    }
+//
+//    public static void writeNewVoluntario(Integer id, String nome, String tipoUsuario, String email) {
+//        Voluntario voluntario = new Voluntario(id, nome, tipoUsuario, email);
+//        Map<String, Object> postValues = voluntario.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        mRootRef.child("usuarios/voluntarios/").push().setValue(voluntario);
+//    }
+//
+//    public static void writeNewIdoso(Integer id, String nome, String tipoUsuario, String email) {
+//        Idoso idoso = new Idoso(id, nome, tipoUsuario, email);
+//        Map<String, Object> postValues = idoso.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        mRootRef.child("usuarios/idosos/").push().setValue(idoso);
+//    }
 
 }
 
