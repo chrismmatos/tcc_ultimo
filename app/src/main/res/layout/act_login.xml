@@ -3,16 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.christian.tcc.LoginAct">
+    android:background="@color/colorPrimaryLight"
+    tools:context="com.example.christian.tcc.activitys.LoginAct">
 
     <include
         android:id="@+id/includeLogin"
         layout="@layout/content_login"
-        android:visibility="visible"/>
+        android:visibility="visible" />
+
     <include
         android:id="@+id/includeRegistro"
         layout="@layout/content_login_register"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
 
 </android.support.design.widget.CoordinatorLayout>

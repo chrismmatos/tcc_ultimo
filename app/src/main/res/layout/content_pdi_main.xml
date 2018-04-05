@@ -5,72 +5,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:accessibilityTraversalBefore="@+id/b"
+    android:background="@color/common_google_signin_btn_text_dark_default"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.christian.tcc.PdiMainActivity"
+    tools:context="com.example.christian.tcc.activitys.PdiMainActivity"
+    tools:layout_editor_absoluteY="81dp"
     tools:showIn="@layout/activity_pdi_main">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </RelativeLayout>
 
     <Button
         android:id="@+id/btn_solicitarPAE"
         style="@android:style/Widget.Material.Light.Button.Toggle"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryDark"
         android:text="SOLICITAR ACOMPANHAMENTO ESPECÍFICO"
-        app:layout_constraintEnd_toEndOf="@+id/editText3"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/editText3"
+        android:textColor="@color/colorTextSecundary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerPAE" />
 
     <Button
         android:id="@+id/btn_solicitarPA"
         style="@android:style/Widget.Material.Light.Button.Toggle"
         android:layout_width="0dp"
-        android:layout_height="64dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryDark"
         android:elevation="0dp"
         android:text="SOLICITAR ACOMPANHAMENTO"
-        app:layout_constraintEnd_toEndOf="@+id/editText2"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/editText2"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
-
-    <EditText
-        android:id="@+id/editText2"
-        style="@style/Widget.AppCompat.AutoCompleteTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="textMultiLine"
-        android:text="Voluntários que estão próximos serão notificados para acompanhá-lo"
-        android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/editText3"
-        style="@style/Widget.AppCompat.AutoCompleteTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="textMultiLine"
-        android:text="Agentes que estão próximos serão notificados para acompanhá-lo de acordo com a sua solicitação."
-        android:textStyle="italic"
+        android:textColor="@color/colorTextSecundary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_solicitarPA" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Spinner
         android:id="@+id/spinnerPAE"
@@ -78,12 +54,40 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:entries="@array/pae"
-        app:layout_constraintEnd_toEndOf="@+id/editText3"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/editText3"
-        app:layout_constraintTop_toBottomOf="@+id/editText3" />
+        android:textColor="@color/colorTextPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:text="Voluntários que estão próximos serão notificados para acompanhá-lo"
+        android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView"
+        android:textColor="@color/colorTextPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="64dp"
+        android:text="Agentes que estão próximos serão notificados para acompanhá-lo de acordo com a sua solicitação."
+        android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView"
+        android:textColor="@color/colorTextPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_solicitarPA" />
 
 </android.support.constraint.ConstraintLayout>

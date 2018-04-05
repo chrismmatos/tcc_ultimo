@@ -1,4 +1,4 @@
-package com.example.christian.tcc;
+package com.example.christian.tcc.activitys;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import com.example.christian.tcc.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

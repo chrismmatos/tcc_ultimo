@@ -1,4 +1,4 @@
-package com.example.christian.tcc;
+package com.example.christian.tcc.activitys;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -36,6 +36,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.christian.tcc.R;
+import com.example.christian.tcc.activitys.MainAct;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -51,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static com.example.christian.tcc.MainAct.mRootRef;
+import static com.example.christian.tcc.activitys.MainAct.mRootRef;
 
 /**
  * A login screen that offers login via email/password.
@@ -520,17 +522,17 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
 
     public static void writeNewIdosoOrVoluntario (String email,String nome, String tipoUsuario) {
-        Usuario usuario = new Usuario(email,nome,tipoUsuario);
-        Map<String, Object> postValues = usuario.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios").push().setValue(usuario);
+        String id = mRootRef.child("usuarios").push().getKey();
+        Usuario usuario = new Usuario(id, email,nome,tipoUsuario);
+
+        mRootRef.child("usuarios").child(id).setValue(usuario);
     }
 
     public static void writeNewAgenteOrPcd (String email,String nome, String tipoUsuario, String tipoPcdAgente) {
-        Usuario usuario = new Usuario(email,nome,tipoUsuario,tipoPcdAgente);
-        Map<String, Object> postValues = usuario.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        mRootRef.child("usuarios").push().setValue(usuario);
+        String id = mRootRef.child("usuarios").push().getKey();
+        Usuario usuario = new Usuario(id, email,nome,tipoUsuario,tipoPcdAgente);
+
+        mRootRef.child("usuarios").child(id).setValue(usuario);
     }
 
 
@@ -566,4 +568,3 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 //    }
 
 }
-

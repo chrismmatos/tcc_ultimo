@@ -18,12 +18,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".MainAct"
+            android:name=".activitys.MainAct"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -33,10 +35,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginAct"
+            android:name=".activitys.LoginAct"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".PdiMainActivity"
+            android:name=".activitys.PdiMainActivity"
             android:label="@string/title_activity_pdi_main"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -52,7 +54,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activitys.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
     </application>
 

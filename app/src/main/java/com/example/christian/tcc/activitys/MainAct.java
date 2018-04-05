@@ -1,9 +1,7 @@
-package com.example.christian.tcc;
+package com.example.christian.tcc.activitys;
 
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,27 +9,19 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.christian.tcc.LoginAct;
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.modelo.Usuario;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -42,11 +32,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static com.example.christian.tcc.Manifest.*;
 
 public class MainAct extends AppCompatActivity{
 
@@ -58,6 +44,7 @@ public class MainAct extends AppCompatActivity{
     private List<Usuario> listUsuarios = new ArrayList<>();
 
     public static DatabaseReference mRootRef;
+    public static DatabaseReference mUserRef;
 
     Button btnGps;
     TextView txtLatitude, txtLongitude;
@@ -67,8 +54,9 @@ public class MainAct extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
 
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         mRootRef = FirebaseDatabase.getInstance().getReference();
+        mUserRef = mRootRef.child("usuarios");
         mRootRef.keepSynced(true);
 
 
@@ -76,24 +64,28 @@ public class MainAct extends AppCompatActivity{
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
 
-            Query query = mRootRef.child("usuarios").orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
+            Query query = mUserRef.orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Usuario usuario = dataSnapshot.getValue(Usuario.class);
 
-                   switch (usuario.getTipoUsuario()){
-                       case "Pessoa com deficiência" : {
-                           startActivity(new Intent(MainAct.this, PdiMainActivity.class));
-                           break;
-                       }
+                    if(dataSnapshot.getValue()!=null) {
+                        DataSnapshot child = dataSnapshot.getChildren().iterator().next();
+                        Usuario usuario = child.getValue(Usuario.class);
 
-                       default:{
-                           Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuario.getEmail() + "!", Toast.LENGTH_LONG).show();
-                       }
+                        switch (usuario.getTipoUsuario()) {
+                            case "Pessoa com deficiência": {
+                                startActivity(new Intent(MainAct.this, PdiMainActivity.class));
+                                break;
+                            }
 
-                   }
+                            default: {
+                                Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuario.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            }
 
+                        }
+
+                    }
 
                 }
 

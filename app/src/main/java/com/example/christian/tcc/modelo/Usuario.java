@@ -10,6 +10,7 @@ import java.util.Map;
 
 
 public class Usuario implements Serializable {
+    private String id = "";
     private Integer idLogado = 0;
     private String tipoUsuario = "";
     private String tipoAgente = "";
@@ -17,15 +18,19 @@ public class Usuario implements Serializable {
     private String nome = "";
     private String email = "";
     private Integer numPas = 0;
+    private Double latitude = 0.0;
+    private Double longitude = 0.0;
 
 
 
     public Usuario(){}
 
-    public Usuario(String tipoUsuario, String tipoAgentePCD, String nome, String email) {
-        this.tipoUsuario = tipoUsuario;
+    public Usuario(String id, String email, String nome,  String tipoUsuario, String tipoAgentePCD) {
+        this.id = id;
         this.nome = nome;
         this.email = email;
+        this.tipoUsuario = tipoUsuario;
+
 
         switch (tipoUsuario){
 
@@ -42,10 +47,50 @@ public class Usuario implements Serializable {
         }
     }
 
-    public Usuario(String tipoUsuario, String nome, String email) {
-        this.tipoUsuario = tipoUsuario;
+    public Usuario(String id, String email, String nome, String tipoUsuario) {
+        this.id = id;
         this.nome = nome;
         this.email = email;
+        this.tipoUsuario = tipoUsuario;
+
+    }
+
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id='" + id + '\'' +
+                ", idLogado=" + idLogado +
+                ", tipoUsuario='" + tipoUsuario + '\'' +
+                ", tipoAgente='" + tipoAgente + '\'' +
+                ", tipoPCD='" + tipoPCD + '\'' +
+                ", nome='" + nome + '\'' +
+                ", email='" + email + '\'' +
+                ", numPas=" + numPas +
+                '}';
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Integer getIdLogado() {
@@ -106,6 +151,7 @@ public class Usuario implements Serializable {
 
     public Map <String, Object> toMap(){
         HashMap<String,Object> result = new HashMap<>();
+        result.put("id",id);
         result.put("idLogado",idLogado);
         result.put("tipoUsuario",tipoUsuario);
         result.put("nome",nome);
@@ -113,6 +159,8 @@ public class Usuario implements Serializable {
         result.put("tipoAgente",tipoAgente);
         result.put("tipoPCD",tipoPCD);
         result.put("numPas",numPas);
+        result.put("latitude",latitude);
+        result.put("longitude",longitude);
 
         return  result;
     }
