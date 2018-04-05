@@ -47,6 +47,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,9 +70,10 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
     String tipoUsuario;
     String tipoAgente;
     String tipoPCD;
+    Usuario novoUsuario;
 
 
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
 
     String email;
     String password;
@@ -245,68 +247,12 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
             if (isNewUser) {
 
+                novoUsuario = new Usuario();
+
                 findViewById(R.id.includeLogin).setVisibility(View.INVISIBLE);
                 findViewById(R.id.includeRegistro).setVisibility(View.VISIBLE);
 
                 Button btnConcluir = findViewById(R.id.btn_concluir);
-
-                btnConcluir.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        findViewById(R.id.includeLogin).setVisibility(View.VISIBLE);
-                        findViewById(R.id.includeRegistro).setVisibility(View.INVISIBLE);
-
-                        nomeUsuario = edtNome.getText().toString();
-
-                        switch (tipoUsuario) {
-
-                            case "Agente": {
-                                tipoAgente = spnTipoAgente.getSelectedItem().toString();
-                                writeNewAgenteOrPcd(email, nomeUsuario,tipoUsuario, tipoAgente);
-                                break;
-                            }
-
-                            case "Pessoa com deficiência": {
-                                tipoPCD = spnTipoPcd.getSelectedItem().toString();
-                                writeNewAgenteOrPcd(email, nomeUsuario,tipoUsuario, tipoPCD);
-                                break;
-                            }
-
-                            case "Idoso": {
-                                writeNewIdosoOrVoluntario(email,nomeUsuario,tipoUsuario);
-                                break;
-                            }
-
-                            case "Voluntário": {
-                                writeNewIdosoOrVoluntario(email,nomeUsuario,tipoUsuario);
-                                break;
-                            }
-
-                            default:
-                                break;
-
-                        }
-
-                        showProgress(true);
-                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(LoginAct.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                showProgress(false);
-                                Toast.makeText(getApplicationContext(), "Usuário cadastrado com sucesso. Agora você pode se autenticar com suas credenciais!", Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                    }
-                });
-
-                Button btnCancelar = findViewById(R.id.btn_cancelar);
-                btnCancelar.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        findViewById(R.id.includeLogin).setVisibility(View.VISIBLE);
-                        findViewById(R.id.includeRegistro).setVisibility(View.INVISIBLE);
-                    }
-                });
 
                 spnTipoUsuario.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
                     @Override
@@ -338,6 +284,63 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                     }
                 });
+
+                btnConcluir.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        findViewById(R.id.includeLogin).setVisibility(View.VISIBLE);
+                        findViewById(R.id.includeRegistro).setVisibility(View.INVISIBLE);
+
+                        nomeUsuario = edtNome.getText().toString();
+
+                        novoUsuario.setEmail(email);;
+                        novoUsuario.setTipoUsuario(tipoUsuario);
+                        novoUsuario.setNome(nomeUsuario);
+
+                        switch (tipoUsuario) {
+
+                            case "Agente": {
+                                tipoAgente= spnTipoAgente.getSelectedItem().toString();
+                                novoUsuario.setTipoAgente(tipoAgente);
+                                break;
+                            }
+
+                            case "Pessoa com deficiência": {
+                                tipoPCD = spnTipoPcd.getSelectedItem().toString();
+                                novoUsuario.setTipoAgente(tipoPCD);
+                                break;
+                            }
+
+                            default:
+                                break;
+
+                        }
+
+                        showProgress(true);
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(LoginAct.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                String idUsuario = task.getResult().getUser().getUid();
+                                novoUsuario.setId(idUsuario);
+                                novoUsuario.salvar();
+                                showProgress(false);
+                                Toast.makeText(getApplicationContext(), "Usuário cadastrado com sucesso. Agora você pode se autenticar com suas credenciais!", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+
+                Button btnCancelar = findViewById(R.id.btn_cancelar);
+                btnCancelar.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        findViewById(R.id.includeLogin).setVisibility(View.VISIBLE);
+                        findViewById(R.id.includeRegistro).setVisibility(View.INVISIBLE);
+                    }
+                });
+
+
 
             } else {
                 showProgress(true);
@@ -519,52 +522,5 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
             showProgress(false);
         }
     }
-
-
-    public static void writeNewIdosoOrVoluntario (String email,String nome, String tipoUsuario) {
-        String id = mRootRef.child("usuarios").push().getKey();
-        Usuario usuario = new Usuario(id, email,nome,tipoUsuario);
-
-        mRootRef.child("usuarios").child(id).setValue(usuario);
-    }
-
-    public static void writeNewAgenteOrPcd (String email,String nome, String tipoUsuario, String tipoPcdAgente) {
-        String id = mRootRef.child("usuarios").push().getKey();
-        Usuario usuario = new Usuario(id, email,nome,tipoUsuario,tipoPcdAgente);
-
-        mRootRef.child("usuarios").child(id).setValue(usuario);
-    }
-
-
-
-    //Cria Usuários
-
-//    public static void writeNewAgente(Integer id, String nome, String tipoAgente, String tipoUsuario, String email) {
-//        Agente agente = new Agente(id, nome, tipoAgente, tipoUsuario, email);
-//        Map<String, Object> postValues = agente.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        mRootRef.child("usuarios/agentes/").push().setValue(agente);
-//    }
-//
-//    public static void writeNewPCD(Integer id, String nome, String tipoPCD, String tipoUsuario, String email) {
-//        Pcd pcd = new Pcd(id, nome, tipoPCD, tipoUsuario, email);
-//        Map<String, Object> postValues = pcd.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        mRootRef.child("usuarios/pcds/").push().setValue(pcd);
-//    }
-//
-//    public static void writeNewVoluntario(Integer id, String nome, String tipoUsuario, String email) {
-//        Voluntario voluntario = new Voluntario(id, nome, tipoUsuario, email);
-//        Map<String, Object> postValues = voluntario.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        mRootRef.child("usuarios/voluntarios/").push().setValue(voluntario);
-//    }
-//
-//    public static void writeNewIdoso(Integer id, String nome, String tipoUsuario, String email) {
-//        Idoso idoso = new Idoso(id, nome, tipoUsuario, email);
-//        Map<String, Object> postValues = idoso.toMap();
-//        Map<String, Object> childUpdates = new HashMap<>();
-//        mRootRef.child("usuarios/idosos/").push().setValue(idoso);
-//    }
 
 }

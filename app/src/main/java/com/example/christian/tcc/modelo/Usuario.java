@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.christian.tcc.activitys.MainAct.mRootRef;
+
 /**
  * Created by christian on 11/03/2018.
  */
@@ -165,5 +167,8 @@ public class Usuario implements Serializable {
         return  result;
     }
 
+    public void salvar(){
+        mRootRef.child("usuarios").child(id).setValue(this);
+    }
 
 }
