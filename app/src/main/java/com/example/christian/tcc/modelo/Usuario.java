@@ -1,10 +1,13 @@
 package com.example.christian.tcc.modelo;
 
+import com.example.christian.tcc.config.ConfiguracaoFirebase;
+import com.google.firebase.database.DatabaseReference;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.christian.tcc.activitys.MainAct.mRootRef;
+
 
 /**
  * Created by christian on 11/03/2018.
@@ -23,53 +26,12 @@ public class Usuario implements Serializable {
     private Double latitude = 0.0;
     private Double longitude = 0.0;
 
+    private DatabaseReference mRootRef;
+
 
 
     public Usuario(){}
 
-    public Usuario(String id, String email, String nome,  String tipoUsuario, String tipoAgentePCD) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.tipoUsuario = tipoUsuario;
-
-
-        switch (tipoUsuario){
-
-            case "Pessoa com deficiência":{
-                tipoPCD = tipoAgentePCD;
-                break;
-            }
-            case "Agente":{
-                tipoAgente = tipoAgentePCD;
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    public Usuario(String id, String email, String nome, String tipoUsuario) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.tipoUsuario = tipoUsuario;
-
-    }
-
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id='" + id + '\'' +
-                ", idLogado=" + idLogado +
-                ", tipoUsuario='" + tipoUsuario + '\'' +
-                ", tipoAgente='" + tipoAgente + '\'' +
-                ", tipoPCD='" + tipoPCD + '\'' +
-                ", nome='" + nome + '\'' +
-                ", email='" + email + '\'' +
-                ", numPas=" + numPas +
-                '}';
-    }
 
     public Double getLatitude() {
         return latitude;
@@ -167,7 +129,22 @@ public class Usuario implements Serializable {
         return  result;
     }
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id='" + id + '\'' +
+                ", idLogado=" + idLogado +
+                ", tipoUsuario='" + tipoUsuario + '\'' +
+                ", tipoAgente='" + tipoAgente + '\'' +
+                ", tipoPCD='" + tipoPCD + '\'' +
+                ", nome='" + nome + '\'' +
+                ", email='" + email + '\'' +
+                ", numPas=" + numPas +
+                '}';
+    }
+
     public void salvar(){
+        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mRootRef.child("usuarios").child(id).setValue(this);
     }
 

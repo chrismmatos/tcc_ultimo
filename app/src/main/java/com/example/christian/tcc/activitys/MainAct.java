@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,12 +56,11 @@ public class MainAct extends AppCompatActivity{
         setContentView(R.layout.act_main);
 
 
-        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mUserRef = mRootRef.child("usuarios");
-        mRootRef.keepSynced(true);
 
+        mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
-        mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
 

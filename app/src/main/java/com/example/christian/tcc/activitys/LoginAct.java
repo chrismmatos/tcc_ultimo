@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.MainAct;
+import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -132,7 +133,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {

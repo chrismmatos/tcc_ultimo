@@ -13,7 +13,7 @@ public final class ConfiguracaoFirebase {
     private static DatabaseReference referenciaFirebase;
     private static FirebaseAuth autenticacao;
 
-    public static DatabaseReference getFirebase(){
+    public static DatabaseReference getFirebaseDatabase(){
 
         if(referenciaFirebase ==null) {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
