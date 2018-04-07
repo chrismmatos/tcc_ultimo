@@ -31,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +40,13 @@ public class MainAct extends AppCompatActivity{
 
     private FirebaseAuth mAuth;
 
-    private TextView tvCoordinate;
     private GoogleApiClient mGoogleApiClient;
 
     private List<Usuario> listUsuarios = new ArrayList<>();
 
     public static DatabaseReference mRootRef;
     public static DatabaseReference mUserRef;
+    public static Usuario usuarioLogado;
 
     Button btnGps;
     TextView txtLatitude, txtLongitude;
@@ -71,16 +72,18 @@ public class MainAct extends AppCompatActivity{
 
                     if(dataSnapshot.getValue()!=null) {
                         DataSnapshot child = dataSnapshot.getChildren().iterator().next();
-                        Usuario usuario = child.getValue(Usuario.class);
+                        usuarioLogado = child.getValue(Usuario.class);
+                        usuarioLogado.setToken(FirebaseInstanceId.getInstance().getToken());
+                        usuarioLogado.salvar();
 
-                        switch (usuario.getTipoUsuario()) {
+                        switch (usuarioLogado.getTipoUsuario()) {
                             case "Pessoa com deficiência": {
                                 startActivity(new Intent(MainAct.this, PdiMainActivity.class));
                                 break;
                             }
 
                             default: {
-                                Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuario.getEmail() + "!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -105,19 +108,11 @@ public class MainAct extends AppCompatActivity{
         txtLatitude= (TextView) findViewById(R.id.tv_exibe_latitude);
         txtLongitude = (TextView) findViewById(R.id.tv_exibe_longidute);
 
-        btnGps = (Button) findViewById(R.id.btn_onde_estou);
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         pedirPermissoes();
-
-        //Usuarios de teste ************
-
-        //writeNewUser(2,"a");
-        //writeNewUser(3,"b");
-
 
         DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("usuarios");
 
@@ -195,6 +190,9 @@ public class MainAct extends AppCompatActivity{
         Double latPoint = location.getLatitude();
         Double lngPoint = location.getLongitude();
 
+        usuarioLogado.setLatitude(latPoint);
+        usuarioLogado.setLongitude(lngPoint);
+        usuarioLogado.salvar();
         txtLatitude.setText(latPoint.toString());
         txtLongitude.setText(lngPoint.toString());
     }

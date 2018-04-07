@@ -25,13 +25,19 @@ public class Usuario implements Serializable {
     private Integer numPas = 0;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
+    private String token = "";
 
     private DatabaseReference mRootRef;
 
-
-
     public Usuario(){}
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public Double getLatitude() {
         return latitude;
@@ -129,19 +135,6 @@ public class Usuario implements Serializable {
         return  result;
     }
 
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id='" + id + '\'' +
-                ", idLogado=" + idLogado +
-                ", tipoUsuario='" + tipoUsuario + '\'' +
-                ", tipoAgente='" + tipoAgente + '\'' +
-                ", tipoPCD='" + tipoPCD + '\'' +
-                ", nome='" + nome + '\'' +
-                ", email='" + email + '\'' +
-                ", numPas=" + numPas +
-                '}';
-    }
 
     public void salvar(){
         mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
