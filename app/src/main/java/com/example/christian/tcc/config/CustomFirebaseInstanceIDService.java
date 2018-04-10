@@ -15,6 +15,5 @@ public class CustomFirebaseInstanceIDService extends FirebaseInstanceIdService{
             usuarioLogado.setToken(token);
             usuarioLogado.salvar();
         }
-
     }
 }
