@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,9 +33,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainAct extends AppCompatActivity{
 
@@ -63,6 +67,9 @@ public class MainAct extends AppCompatActivity{
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
         FirebaseUser user = mAuth.getCurrentUser();
+
+        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
+
         if (user != null) {
 
             Query query = mUserRef.orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
@@ -113,6 +120,7 @@ public class MainAct extends AppCompatActivity{
         setSupportActionBar(toolbar);
 
         pedirPermissoes();
+
 
         DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("usuarios");
 
@@ -190,11 +198,15 @@ public class MainAct extends AppCompatActivity{
         Double latPoint = location.getLatitude();
         Double lngPoint = location.getLongitude();
 
-        usuarioLogado.setLatitude(latPoint);
-        usuarioLogado.setLongitude(lngPoint);
-        usuarioLogado.salvar();
-        txtLatitude.setText(latPoint.toString());
-        txtLongitude.setText(lngPoint.toString());
+        if(usuarioLogado!=null) {
+
+            usuarioLogado.setLatitude(latPoint);
+            usuarioLogado.setLongitude(lngPoint);
+            usuarioLogado.salvar();
+            txtLatitude.setText(latPoint.toString());
+            txtLongitude.setText(lngPoint.toString());
+
+        }
     }
 
 
