@@ -15,37 +15,46 @@ import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
+import com.example.christian.tcc.helper.Notificacao;
+import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 import static com.example.christian.tcc.activitys.MainAct.usuarioLogado;
+import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class PdiMainActivity extends AppCompatActivity {
 
     public static final String ADRESS ="https://fcm.googleapis.com/fcm/send";
 
-    public static final String SERVER_KEY = "AAAA7skqMcQ:APA91bFNM_stckhqzLOVd6xDTJ1jCvRHJ2oTPrl0W0GXTWswTx5uBNSRjTKyFUu9UKy0Hb6wZGcw1i7lA9CvQVvVNkqJ50QU6qMNOX0iXMu0P6Jf7cmOPteQwmHBqcxOv3eugJ8Nj_eh";
-
     private FirebaseAuth mAuth;
     private Button btnPa;
+
     OkHttpClient mClient = new OkHttpClient();
+
+    JSONObject dataNotification;
+
+    private DatabaseReference mUserRef = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
     private String SENDER_ID = "cU1VUF5EAms:APA91bFH7WQ7dYJGmmM16aRjCUmBMPzA28OT9R8VTI5Z2O6sekFXOR9CuHli0C-qZkEpPm-vWgJYGayDuuzdxAUh4pkZ1hVu9na2CV2dTheL81FyBWm6uzyq0gQujwIPdkJBgSI8r9R7";
 
@@ -69,7 +78,6 @@ public class PdiMainActivity extends AppCompatActivity {
             }
         });
 
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -77,14 +85,35 @@ public class PdiMainActivity extends AppCompatActivity {
 
     public void enviaPa()  {
 
-        sendNotification(SENDER_ID);
-//        DatabaseReference  mRoot = ConfiguracaoFirebase.getFirebaseDatabase();
-//
-//        Map pedido = new HashMap<>();
-//        pedido.put("origem", usuarioLogado.getNome());
-//        pedido.put("token", SENDER_ID);
-//        pedido.put("destino", "agente teste");
+       dataNotification = new JSONObject();
+        try {
+            dataNotification.put("usuario","valorUsuario");
+            dataNotification.put("pedido","valorPedido");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+
+
+        Query query = mUserRef.orderByChild("tipoUsuario").equalTo("Agente").limitToFirst(1);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.getValue()!=null) {
+                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
+                    Usuario usuarioNotificado = child.getValue(Usuario.class);
+                    sendNotification(usuarioNotificado.getToken(),dataNotification);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Se ocorrer um erro
+            }
+        });
 
 
     }
@@ -113,40 +142,6 @@ public class PdiMainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-    public static final MediaType JSON
-            = MediaType.parse("application/json; charset=utf-8");
-
-    private void sendNotification(final String regToken) {
-        new AsyncTask<Void,Void,Void>(){
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    OkHttpClient client = new OkHttpClient();
-                    JSONObject json=new JSONObject();
-                    JSONObject dataJson=new JSONObject();
-                    dataJson.put("body","Hi this is sent from device to device");
-                    dataJson.put("title","dummy title");
-                    json.put("notification",dataJson);
-                    json.put("to",regToken);
-                    RequestBody body = RequestBody.create(JSON, json.toString());
-                    Request request = new Request.Builder()
-                            .header("Authorization","key="+SERVER_KEY)
-                            .url("https://fcm.googleapis.com/fcm/send")
-                            .post(body)
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    String finalResponse = response.body().string();
-                }catch (Exception e){
-                    //Log.d(TAG,e+"");
-                }
-                return null;
-            }
-        }.execute();
-
-    }
-
-
 
 
 }

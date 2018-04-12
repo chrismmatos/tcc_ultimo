@@ -20,9 +20,6 @@ import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService{
 
-    public static final String SERVER_KEY = "AAAA7skqMcQ:APA91bHoqqKPS6USp01kxmov-hOqwUd2SH34f_6O8cUrpcBttAU8XJNq5IeD79geyYGAVe60sCF3gTX" +
-            "Qgsv7IVLeB6H0OU73lZKo5LA7U0V3NlN3q2gFgJky_2ijxVujgg7iUgTuDNr";
-
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
