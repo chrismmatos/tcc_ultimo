@@ -2,6 +2,7 @@ package com.example.christian.tcc.activitys;
 
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -59,6 +60,9 @@ public class MainAct extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_main);
+
+        NotificationManager notifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notifyManager.cancelAll();
 
 
         mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();

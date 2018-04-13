@@ -135,7 +135,6 @@ public class Usuario implements Serializable {
         return  result;
     }
 
-
     public void salvar(){
         mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mRootRef.child("usuarios").child(id).setValue(this);

@@ -30,7 +30,7 @@ public class Notificacao {
                     ttl.put("ttl","60s");
                     dataJson.put("body","Hi this is sent from device to device");
                     dataJson.put("title","dummy title");
-                    json.put("notification",dataJson);
+                    //json.put("notification",dataJson);
                     json.put("to",regToken);
                     json.put("data", dataNotification);
                     json.put ("android",ttl);

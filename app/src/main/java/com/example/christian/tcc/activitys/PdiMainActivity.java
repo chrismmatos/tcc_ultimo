@@ -89,6 +89,8 @@ public class PdiMainActivity extends AppCompatActivity {
         try {
             dataNotification.put("usuario","valorUsuario");
             dataNotification.put("pedido","valorPedido");
+            dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
+            dataNotification.put("titulo", "Pedido de Acompannhamento");
         } catch (JSONException e) {
             e.printStackTrace();
         }
