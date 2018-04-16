@@ -40,7 +40,7 @@ import java.util.Map;
 import okhttp3.OkHttpClient;
 
 
-import static com.example.christian.tcc.activitys.MainAct.usuarioLogado;
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class PdiMainActivity extends AppCompatActivity {
@@ -123,7 +123,7 @@ public class PdiMainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_pdi, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -135,7 +135,7 @@ public class PdiMainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_sair) {
+        if (id == R.id.action_exit) {
             mAuth.signOut();
             startActivity(new Intent(this, LoginAct.class));
             finish();
@@ -144,6 +144,7 @@ public class PdiMainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
 }

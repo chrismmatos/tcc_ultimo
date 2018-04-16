@@ -16,7 +16,7 @@ import android.util.Log;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.AgenteAcompActivity;
-import com.example.christian.tcc.activitys.MainAct;
+import com.example.christian.tcc.activitys.AgenteMainActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -55,7 +55,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     aceitarPI);
 
             /* BUTTON - ENTRAR */
-            Intent recusar = new Intent(this, MainAct.class);
+            Intent recusar = new Intent(this, AgenteMainActivity.class);
             recusar.setAction( "action-recusar" );
             PendingIntent recusarPI = PendingIntent.getActivity(
                     this,

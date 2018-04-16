@@ -48,19 +48,24 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".activitys.MainAct"
-            android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!--<activity-->
+            <!--android:name=".activitys.MainAct"-->
+            <!--android:label="@string/title_activity_main"-->
+            <!--android:theme="@style/AppTheme.NoActionBar">-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!--</activity>-->
+
         <activity
             android:name=".activitys.LoginAct"
-            android:label="@string/title_activity_login" />
+            android:label="@string/title_activity_login">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
+        </activity>
+
         <activity
             android:name=".activitys.PdiMainActivity"
             android:label="SafeFollowing"

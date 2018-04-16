@@ -3,7 +3,7 @@ package com.example.christian.tcc.config;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
-import static com.example.christian.tcc.activitys.MainAct.usuarioLogado;
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 
 public class CustomFirebaseInstanceIDService extends FirebaseInstanceIdService{
 

@@ -3,6 +3,7 @@ package com.example.christian.tcc.activitys;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -20,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -37,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
-import com.example.christian.tcc.activitys.MainAct;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,17 +46,22 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static com.example.christian.tcc.activitys.MainAct.mRootRef;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -63,6 +69,11 @@ import static com.example.christian.tcc.activitys.MainAct.mRootRef;
 public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private FirebaseAnalytics mFirebaseAnalytics;
+    private FirebaseAuth mAuth;
+
+    public static DatabaseReference mRootRef;
+    public static DatabaseReference mUserRef;
+    public static Usuario usuarioLogado;
 
     EditText edtNome;
     Spinner spnTipoAgente;
@@ -72,13 +83,10 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
     String tipoAgente;
     String tipoPCD;
     Usuario novoUsuario;
-
-
-    public static FirebaseAuth mAuth;
-
     String email;
     String password;
     String nomeUsuario;
+    FirebaseUser user;
 
 
     /**
@@ -104,16 +112,31 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
     private View mProgressView;
     private View mLoginFormView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.act_login);
 
+        NotificationManager notifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notifyManager.cancelAll();
+
+
+        //recupera referências
+        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
+        mUserRef = mRootRef.child("usuarios");
+        mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
+        user = mAuth.getCurrentUser();
+
+        //verifica se o usuário está logado
+        if (user != null)
+            isUsuarioLogado();
+
+
         edtNome = findViewById(R.id.txt_edt_nome);
         spnTipoAgente = findViewById(R.id.spinner_tipo_agente);
         spnTipoPcd = findViewById(R.id.spinner_tipo_pcd);
         spnTipoUsuario = findViewById(R.id.spinnerTipoUsuario);
-
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
 
@@ -133,7 +156,6 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
             }
         });
 
-        mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -153,6 +175,56 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+    }
+
+    public void isUsuarioLogado(){
+
+        Query query = mUserRef.orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.getValue()!=null) {
+                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
+                    usuarioLogado = child.getValue(Usuario.class);
+                    usuarioLogado.setToken(FirebaseInstanceId.getInstance().getToken());
+                    usuarioLogado.salvar();
+
+                    switch (usuarioLogado.getTipoUsuario()) {
+                        case "Pessoa com deficiência": {
+                            startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
+                            finish();
+                            Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            break;
+                        }
+
+                        case "Idoso": {
+                            startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
+                            finish();
+                            Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            break;
+                        }
+
+                        default: {
+                            FirebaseMessaging.getInstance().subscribeToTopic("agentes");
+                            startActivity(new Intent(LoginAct.this, AgenteMainActivity.class));
+                            finish();
+                            Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Se ocorrer um erro
+            }
+        });
+
 
     }
 
@@ -353,8 +425,8 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                         try {
                             if (task.getResult().getUser() != null) {
-                                startActivity(new Intent(LoginAct.this, MainAct.class));
-                                finish();
+                                user = task.getResult().getUser();
+                                isUsuarioLogado();
                             } else {
                                 Toast.makeText(getApplicationContext(), "Email e/ou senha incorretos.", Toast.LENGTH_LONG).show();
                             }
