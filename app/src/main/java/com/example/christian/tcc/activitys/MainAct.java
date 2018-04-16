@@ -72,7 +72,6 @@ public class MainAct extends AppCompatActivity{
 
         FirebaseUser user = mAuth.getCurrentUser();
 
-        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications");
 
         if (user != null) {
 
@@ -90,10 +89,13 @@ public class MainAct extends AppCompatActivity{
                         switch (usuarioLogado.getTipoUsuario()) {
                             case "Pessoa com deficiência": {
                                 startActivity(new Intent(MainAct.this, PdiMainActivity.class));
+                                Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
                                 break;
                             }
 
                             default: {
+                                FirebaseMessaging.getInstance().subscribeToTopic("agentes");
+                                startActivity(new Intent(MainAct.this, AgenteMainActivity.class));
                                 Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
                             }
 
@@ -125,28 +127,6 @@ public class MainAct extends AppCompatActivity{
 
         pedirPermissoes();
 
-
-        DatabaseReference refUsers = FirebaseDatabase.getInstance().getReference("usuarios");
-
-        refUsers.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Usuario usuario;
-
-                for (DataSnapshot usuarioSnapshot: dataSnapshot.getChildren()) {
-                    usuario = usuarioSnapshot.getValue(Usuario.class);
-                    listUsuarios.add(usuario);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w( "loadPost:onCancelled", databaseError.toException());
-                // ...
-            }
-        });
 
 
     }
@@ -230,6 +210,9 @@ public class MainAct extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("pushNotifications");
+            usuarioLogado.setToken("");
+            usuarioLogado.salvar();
             mAuth.signOut();
             startActivity(new Intent(this, LoginAct.class));
             finish();
