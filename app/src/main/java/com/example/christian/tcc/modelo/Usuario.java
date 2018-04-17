@@ -29,7 +29,7 @@ public class Usuario implements Serializable {
 
     private DatabaseReference mRootRef;
 
-    public Usuario(){}
+    public Usuario(){        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();}
 
     public String getToken() {
         return token;
@@ -136,7 +136,6 @@ public class Usuario implements Serializable {
     }
 
     public void salvar(){
-        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mRootRef.child("usuarios").child(id).setValue(this);
     }
 

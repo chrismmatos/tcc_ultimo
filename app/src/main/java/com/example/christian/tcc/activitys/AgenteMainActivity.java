@@ -1,6 +1,7 @@
 package com.example.christian.tcc.activitys;
 
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
 import com.example.christian.tcc.config.MyFirebaseMessagingService;
@@ -109,6 +111,18 @@ public class AgenteMainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ChecaSegundoPlano.activityResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ChecaSegundoPlano.activityPaused();
     }
 
 

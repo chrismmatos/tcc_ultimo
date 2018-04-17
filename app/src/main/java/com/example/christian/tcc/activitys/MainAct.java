@@ -90,7 +90,8 @@
 //                            case "Pessoa com deficiência": {
 //                                startActivity(new Intent(MainAct.this, PdiMainActivity.class));
 //                                Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
-//                                break;
+//
+//           break;
 //                            }
 //
 //                            default: {

@@ -48,24 +48,23 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!--<activity-->
-            <!--android:name=".activitys.MainAct"-->
-            <!--android:label="@string/title_activity_main"-->
-            <!--android:theme="@style/AppTheme.NoActionBar">-->
+        <!-- <activity -->
+        <!-- android:name=".activitys.MainAct" -->
+        <!-- android:label="@string/title_activity_main" -->
+        <!-- android:theme="@style/AppTheme.NoActionBar"> -->
 
-        <!--</activity>-->
+
+        <!-- </activity> -->
 
         <activity
             android:name=".activitys.LoginAct"
             android:label="@string/title_activity_login">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-
         <activity
             android:name=".activitys.PdiMainActivity"
             android:label="SafeFollowing"
@@ -86,7 +85,8 @@
             android:name=".activitys.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".activitys.AgenteAcompActivity" />
-        <activity android:name=".activitys.AgenteMainActivity"></activity>
+        <activity android:name=".activitys.AgenteMainActivity" />
+        <activity android:name=".activitys.DialogActivity"></activity>
     </application>
 
 </manifest>

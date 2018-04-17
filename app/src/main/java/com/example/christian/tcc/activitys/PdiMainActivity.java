@@ -14,8 +14,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.helper.Notificacao;
+import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +42,7 @@ import java.util.Map;
 import okhttp3.OkHttpClient;
 
 
+import static com.example.christian.tcc.activitys.LoginAct.mRootRef;
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
@@ -85,10 +88,17 @@ public class PdiMainActivity extends AppCompatActivity {
 
     public void enviaPa()  {
 
+        PedidoAcompanhamento pedido = new PedidoAcompanhamento();
+        String idPedido = mRootRef.child("pedidos").push().getKey();
+
+        pedido.setId(idPedido);
+        pedido.setUsuario(usuarioLogado.getId());
+        pedido.salvar();
+
        dataNotification = new JSONObject();
         try {
-            dataNotification.put("usuario","valorUsuario");
-            dataNotification.put("pedido","valorPedido");
+            dataNotification.put("usuario",pedido.getUsuario());
+            dataNotification.put("id",pedido.getId());
             dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
             dataNotification.put("titulo", "Pedido de Acompannhamento");
         } catch (JSONException e) {
@@ -146,5 +156,16 @@ public class PdiMainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ChecaSegundoPlano.activityResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ChecaSegundoPlano.activityPaused();
+    }
 
 }
