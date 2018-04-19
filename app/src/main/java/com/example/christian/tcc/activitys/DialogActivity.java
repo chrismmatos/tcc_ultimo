@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.example.christian.tcc.R;
 
@@ -19,9 +22,14 @@ public class DialogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog);
 
+        LayoutInflater inflater = this.getLayoutInflater();
+
         //configurar dialog
         dialog = new AlertDialog.Builder(this);
+
+        // dialog.setView(inflater.inflate(R.layout.layout_dialog,null));
         dialog.setTitle(dataMap.get("titulo"));
+
         //configurar mensagem
         dialog.setMessage(dataMap.get("descricao"));
         dialog.setCancelable(false);
@@ -47,7 +55,17 @@ public class DialogActivity extends AppCompatActivity {
                     }
                 });
 
-        dialog.show();
+        AlertDialog alert = dialog.create();
+
+        alert.show();
+
+        Button btnPositive = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button btnNegative = alert.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
+        layoutParams.weight = 10;
+        btnPositive.setLayoutParams(layoutParams);
+        btnNegative.setLayoutParams(layoutParams);
 
         System.out.println("está rodadendo");
     }

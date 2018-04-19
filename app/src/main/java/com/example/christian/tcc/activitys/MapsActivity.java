@@ -49,7 +49,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Marker currentLocationMaker;
     private LatLng currentLocationLatLong;
-    private android.app.AlertDialog.Builder dialog;
     private DatabaseReference mDatabase;
 
     AlertDialog.Builder builder;
@@ -65,30 +64,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         startGettingLocations();
 
-        LinearLayout linearLayout = new LinearLayout(this);
-        linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-        linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+        criaDialog();
+        //getMarkers();
+    }
 
+    void criaDialog(){
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido aceito");
         builder.setMessage("Dirija-se até o usuário para iniciar o acompanhamento");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
-        builder.setView(linearLayout);
         AlertDialog alert = builder.create();
         alert.show();
+        alert.getButton(AlertDialog.BUTTON_NEUTRAL).setGravity(Gravity.CENTER_HORIZONTAL);
 
-//        dialog = new android.app.AlertDialog.Builder(this);
-//        dialog.setTitle("Acompanhamento aceito");
-//        //configurar mensagem
-//        dialog.setMessage("Dirija-se até o local do usuário para acompanhá-lo");
-//        dialog.setCancelable(false);
-//        dialog.setNeutralButton("OK",null);
-//        dialog.show();
+        Button btnNeutral= alert.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
 
-
-        //mDatabase = FirebaseDatabase.getInstance().getReference();
-        //getMarkers();
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNeutral.getLayoutParams();
+        layoutParams.weight = 10;
+        btnNeutral.setLayoutParams(layoutParams);
     }
 
 

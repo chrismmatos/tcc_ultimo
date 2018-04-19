@@ -31,7 +31,7 @@ public class Notificacao {
                     dataJson.put("body","Hi this is sent from device to device");
                     dataJson.put("title","dummy title");
                     //json.put("notification",dataJson);
-                    json.put("to",regToken);
+                    json.put("to","/topics/agentes");
                     json.put("priority","high");
                     json.put("data", dataNotification);
                     json.put ("android",ttl);
@@ -43,6 +43,7 @@ public class Notificacao {
                             .build();
                     Response response = client.newCall(request).execute();
                     String finalResponse = response.body().string();
+                    System.out.println("Resposta http"+finalResponse);
                 }catch (Exception e){
                     //Log.d(TAG,e+"");
                 }
