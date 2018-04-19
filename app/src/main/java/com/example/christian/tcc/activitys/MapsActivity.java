@@ -57,7 +57,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startGettingLocations();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         getMarkers();
-
     }
 
 
@@ -79,7 +78,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
 
         CameraPosition cameraPosition = new CameraPosition.Builder().zoom(1).target(recife).build();
-
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
@@ -242,18 +240,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void getAllLocations(Map<String,Object> locations) {
 
-
-
-
         for (Map.Entry<String, Object> entry : locations.entrySet()){
-
             Date newDate = new Date(Long.valueOf(entry.getKey()));
             Map singleLocation = (Map) entry.getValue();
             LatLng latLng = new LatLng((Double) singleLocation.get("latitude"), (Double)singleLocation.get("longitude"));
             addGreenMarker(newDate, latLng);
 
         }
-
 
     }
 

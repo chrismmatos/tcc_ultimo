@@ -1,8 +1,14 @@
 package com.example.christian.tcc.activitys;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
@@ -49,7 +56,6 @@ public class AgenteMainActivity extends AppCompatActivity {
         txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
         txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
 
-
         btnReceberPedidos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,6 +63,7 @@ public class AgenteMainActivity extends AppCompatActivity {
             }
         });
 
+        pedirPermissoes();
     }
 
 
@@ -123,6 +130,64 @@ public class AgenteMainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ChecaSegundoPlano.activityPaused();
+    }
+
+    private void pedirPermissoes() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+        else
+            configurarServico();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    configurarServico();
+                } else {
+                    Toast.makeText(this, "Não vai funcionar!!!", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    public void configurarServico(){
+        try {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+            LocationListener locationListener = new LocationListener() {
+                public void onLocationChanged(Location location) {
+                    atualizar(location);
+                }
+
+                public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+                public void onProviderEnabled(String provider) { }
+
+                public void onProviderDisabled(String provider) { }
+            };
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        }catch(SecurityException ex){
+            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void atualizar(Location location) {
+        Double latPoint = location.getLatitude();
+        Double lngPoint = location.getLongitude();
+
+        if(usuarioLogado!=null) {
+            usuarioLogado.setLatitude(latPoint);
+            usuarioLogado.setLongitude(lngPoint);
+            usuarioLogado.salvar();
+        }
     }
 
 
