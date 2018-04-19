@@ -24,6 +24,7 @@ import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.AgenteAcompActivity;
 import com.example.christian.tcc.activitys.AgenteMainActivity;
 import com.example.christian.tcc.activitys.DialogActivity;
+import com.example.christian.tcc.activitys.NotificationTransitionActivity;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -68,7 +69,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         /* BUTTON - Aceitar*/
-        Intent aceitar = new Intent(this, AgenteAcompActivity.class);
+        Intent aceitar = new Intent(this, NotificationTransitionActivity.class);
         aceitar.setAction( "action-aceitar" );
         PendingIntent aceitarPI = PendingIntent.getActivity(
                 this,

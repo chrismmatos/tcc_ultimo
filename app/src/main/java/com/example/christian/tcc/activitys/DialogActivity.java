@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.helper.Notificacao;
 
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 
@@ -49,9 +51,19 @@ public class DialogActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent aceitar = new Intent(DialogActivity.this, MapsActivity.class);
-                        finish();
-                        startActivity(aceitar);
+                        if(!Notificacao.isAceito(DialogActivity.this)){
+                            Intent aceitar = new Intent(DialogActivity.this, MapsActivity.class);
+                            finish();
+                            startActivity(aceitar);
+                        }
+
+                        else {
+                            Intent recusar = new Intent(DialogActivity.this, AgenteMainActivity.class);
+                            startActivity(recusar);
+                            finish();
+                            Toast.makeText(getApplicationContext(),
+                                    "Esse pedido não está mais ativo!", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
 
