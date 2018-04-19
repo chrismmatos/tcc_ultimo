@@ -41,9 +41,9 @@ public class DialogActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent aceitar = new Intent(DialogActivity.this, AgenteAcompActivity.class);
-                        startActivity(aceitar);
+                        Intent aceitar = new Intent(DialogActivity.this, MapsActivity.class);
                         finish();
+                        startActivity(aceitar);
                     }
                 });
 

@@ -32,6 +32,7 @@ public class Notificacao {
                     dataJson.put("title","dummy title");
                     //json.put("notification",dataJson);
                     json.put("to",regToken);
+                    json.put("priority","high");
                     json.put("data", dataNotification);
                     json.put ("android",ttl);
                     RequestBody body = RequestBody.create(JSON, json.toString());

@@ -13,6 +13,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
@@ -37,13 +41,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
 
     private Marker currentLocationMaker;
     private LatLng currentLocationLatLong;
+    private android.app.AlertDialog.Builder dialog;
     private DatabaseReference mDatabase;
+
+    AlertDialog.Builder builder;
 
 
     @Override
@@ -55,8 +64,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        getMarkers();
+
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+        linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pedido aceito");
+        builder.setMessage("Dirija-se até o usuário para iniciar o acompanhamento");
+        builder.setCancelable(false);
+        builder.setNeutralButton("Ok",null);
+        builder.setView(linearLayout);
+        AlertDialog alert = builder.create();
+        alert.show();
+
+//        dialog = new android.app.AlertDialog.Builder(this);
+//        dialog.setTitle("Acompanhamento aceito");
+//        //configurar mensagem
+//        dialog.setMessage("Dirija-se até o local do usuário para acompanhá-lo");
+//        dialog.setCancelable(false);
+//        dialog.setNeutralButton("OK",null);
+//        dialog.show();
+
+
+        //mDatabase = FirebaseDatabase.getInstance().getReference();
+        //getMarkers();
     }
 
 
@@ -74,12 +106,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng recife = new LatLng(-8.065638, -34.891130);
-        mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
+        // LatLng recife = new LatLng(-8.065638, -34.891130);
+        //mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
 
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(1).target(recife).build();
-
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -92,16 +122,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         currentLocationLatLong = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(currentLocationLatLong);
-        markerOptions.title("Localização atual");
+        markerOptions.title("Minha Localização");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         currentLocationMaker = mMap.addMarker(markerOptions);
 
         //Move to new location
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(1).target(currentLocationLatLong).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
-        getMarkers();
+        //getMarkers();
 
     }
 
@@ -222,39 +252,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void getMarkers(){
 
-        mDatabase.child("location").addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        //Get map of users in datasnapshot
-                        if (dataSnapshot.getValue() != null)
-                            getAllLocations((Map<String,Object>) dataSnapshot.getValue());
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        //handle databaseError
-                    }
-                });
     }
 
-    private void getAllLocations(Map<String,Object> locations) {
+//    private void getAllLocations(Map<String,Object> locations) {
+//
+//        for (Map.Entry<String, Object> entry : locations.entrySet()){
+//            Date newDate = new Date(Long.valueOf(entry.getKey()));
+//            Map singleLocation = (Map) entry.getValue();
+//            LatLng latLng = new LatLng((Double) singleLocation.get("latitude"), (Double)singleLocation.get("longitude"));
+//            addGreenMarker(newDate, latLng);
+//
+//        }
+//
+//    }
 
-        for (Map.Entry<String, Object> entry : locations.entrySet()){
-            Date newDate = new Date(Long.valueOf(entry.getKey()));
-            Map singleLocation = (Map) entry.getValue();
-            LatLng latLng = new LatLng((Double) singleLocation.get("latitude"), (Double)singleLocation.get("longitude"));
-            addGreenMarker(newDate, latLng);
-
-        }
-
-    }
-
-    private void addGreenMarker(Date newDate, LatLng latLng) {
-        SimpleDateFormat dt = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+    private void addGreenMarker( LatLng latLng) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(dt.format(newDate));
+        markerOptions.title("usuario");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mMap.addMarker(markerOptions);
     }
