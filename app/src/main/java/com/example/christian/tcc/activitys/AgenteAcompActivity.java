@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
@@ -40,7 +41,7 @@ public class AgenteAcompActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null) {
-
+                    pedidoAtual = dataSnapshot.getValue(PedidoAcompanhamento.class);
                     if (!pedidoAtual.isIniciado()) {
                         pedidoAtual.setAcompanhante(usuarioLogado.getId());
                         pedidoAtual.setIniciado(true);
@@ -50,6 +51,9 @@ public class AgenteAcompActivity extends AppCompatActivity {
                         Intent i = new Intent(AgenteAcompActivity.this, AgenteMainActivity.class);
                         startActivity(i);
                         finish();
+                        Toast.makeText(getApplicationContext(),
+                            "Esse pedido não está mais ativo!", Toast.LENGTH_LONG).show();
+
                     }
 
                 }

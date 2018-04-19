@@ -194,23 +194,23 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                     switch (usuarioLogado.getTipoUsuario()) {
                         case "Pessoa com deficiência": {
                             startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
-                            finish();
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            finish();
                             break;
                         }
 
                         case "Idoso": {
                             startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
-                            finish();
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            finish();
                             break;
                         }
 
                         default: {
                             FirebaseMessaging.getInstance().subscribeToTopic("agentes");
                             startActivity(new Intent(LoginAct.this, AgenteMainActivity.class));
-                            finish();
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            finish();
                         }
 
                     }
