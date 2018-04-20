@@ -2,21 +2,27 @@ package com.example.christian.tcc.activitys;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.graphics.ColorUtils;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
@@ -65,6 +71,12 @@ public class PdiMainActivity extends AppCompatActivity {
 
     private DatabaseReference mUserRef = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
+    private PedidoAcompanhamento pedido;
+
+    private ValueEventListener pedidoListener;
+
+    private  DatabaseReference refPedido;
+
     private String SENDER_ID = "cU1VUF5EAms:APA91bFH7WQ7dYJGmmM16aRjCUmBMPzA28OT9R8VTI5Z2O6sekFXOR9CuHli0C-qZkEpPm-vWgJYGayDuuzdxAUh4pkZ1hVu9na2CV2dTheL81FyBWm6uzyq0gQujwIPdkJBgSI8r9R7";
 
 
@@ -72,13 +84,10 @@ public class PdiMainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_pdi_main);
 
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
-
         btnPa = (Button)findViewById(R.id.btn_solicitarPA);
-
         btnPa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,9 +102,38 @@ public class PdiMainActivity extends AppCompatActivity {
 
     }
 
+    void criaDialog(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pedido envidado!");
+        builder.setMessage("Localizando"+ " voluntários" + " próximos.");
+        builder.setCancelable(false);
+
+        builder.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                pedido.setIniciado(true);
+                pedido.salvar();
+                refPedido.removeEventListener(pedidoListener);
+                refPedido.removeValue();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setGravity(Gravity.CENTER_HORIZONTAL);
+
+        Button btnNegative= alert.getButton(android.app.AlertDialog.BUTTON_NEGATIVE);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNegative.getLayoutParams();
+        layoutParams.weight = 12;
+        btnNegative.setLayoutParams(layoutParams);
+        btnNegative.setTextColor(Color.MAGENTA);
+
+    }
+
     public void enviaPa()  {
 
-        PedidoAcompanhamento pedido = new PedidoAcompanhamento();
+        pedido = new PedidoAcompanhamento();
         String idPedido = mRootRef.child("pedidos").push().getKey();
 
         pedido.setId(idPedido);
@@ -131,7 +169,30 @@ public class PdiMainActivity extends AppCompatActivity {
             }
         });
 
+        verificaPedido();
 
+        criaDialog();
+    }
+
+    void verificaPedido(){
+        refPedido= mRootRef.child("pedidos").child(pedido.getId());
+
+        pedidoListener = refPedido.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                pedido = dataSnapshot.getValue(PedidoAcompanhamento.class);
+
+                if(pedido.isIniciado()) {
+                    System.out.println("Alguém aceitou o pedido");
+                    refPedido.removeEventListener(pedidoListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override

@@ -95,6 +95,9 @@ public class Notificacao {
                         aceito = true;
                 }
 
+                else
+                    aceito = true;
+
             }
 
             @Override

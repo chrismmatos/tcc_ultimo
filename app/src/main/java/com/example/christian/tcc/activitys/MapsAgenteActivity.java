@@ -104,7 +104,7 @@ public class MapsAgenteActivity extends FragmentActivity implements OnMapReadyCa
     void criaDialog(){
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido aceito");
-        builder.setMessage("Dirija-se até o usuário"+"para iniciar o acompanhamento");
+        builder.setMessage("Dirija-se até o usuário"+" para iniciar o acompanhamento");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
@@ -276,18 +276,6 @@ public class MapsAgenteActivity extends FragmentActivity implements OnMapReadyCa
         }
     }
 
-
-//    private void getAllLocations(Map<String,Object> locations) {
-//
-//        for (Map.Entry<String, Object> entry : locations.entrySet()){
-//            Date newDate = new Date(Long.valueOf(entry.getKey()));
-//            Map singleLocation = (Map) entry.getValue();
-//            LatLng latLng = new LatLng((Double) singleLocation.get("latitude"), (Double)singleLocation.get("longitude"));
-//            addGreenMarker(newDate, latLng);
-//
-//        }
-//
-//    }
 
     private void addGreenMarker( LatLng latLng) {
         if (userLocationMaker != null) {
