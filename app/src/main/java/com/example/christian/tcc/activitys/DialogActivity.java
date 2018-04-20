@@ -1,7 +1,6 @@
 package com.example.christian.tcc.activitys;
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -52,7 +51,7 @@ public class DialogActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(!Notificacao.isAceito(DialogActivity.this)){
-                            Intent aceitar = new Intent(DialogActivity.this, MapsActivity.class);
+                            Intent aceitar = new Intent(DialogActivity.this, MapsAgenteActivity.class);
                             finish();
                             startActivity(aceitar);
                         }

@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
+import com.example.christian.tcc.modelo.PedidoAcompanhamento;
+import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,14 +45,21 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
+import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+public class MapsAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
 
     private Marker currentLocationMaker;
+    private Marker userLocationMaker;
+
     private LatLng currentLocationLatLong;
-    private DatabaseReference mDatabase;
+
+
+    private DatabaseReference refUser;
+
+    private Usuario usuarioAcompanhado;
 
     AlertDialog.Builder builder;
 
@@ -59,23 +68,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
+        String caminho = "usuarios/"+pedidoAtual.getUsuario();
+        refUser = refUser.child(caminho);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(this);
         startGettingLocations();
-
-        mDatabase = ConfiguracaoFirebase.getFirebaseDatabase();
+        getMarkers();
 
         criaDialog();
-        //getMarkers();
+    }
+
+    private void getMarkers(){
+        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null) {
+                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
+                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
+                    addGreenMarker(latLng);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     void criaDialog(){
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido aceito");
-        builder.setMessage("Dirija-se até o usuário para iniciar o acompanhamento");
+        builder.setMessage("Dirija-se até o usuário"+"para iniciar o acompanhamento");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
@@ -103,7 +132,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         // LatLng recife = new LatLng(-8.065638, -34.891130);
         //mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
 
@@ -129,7 +157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
-        //getMarkers();
+        getMarkers();
 
     }
 
@@ -248,9 +276,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void getMarkers(){
-
-    }
 
 //    private void getAllLocations(Map<String,Object> locations) {
 //
@@ -265,11 +290,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //    }
 
     private void addGreenMarker( LatLng latLng) {
+        if (userLocationMaker != null) {
+            userLocationMaker.remove();
+        }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("usuario");
+        markerOptions.title(usuarioAcompanhado.getNome());
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        mMap.addMarker(markerOptions);
+        userLocationMaker = mMap.addMarker(markerOptions);
     }
 
 
