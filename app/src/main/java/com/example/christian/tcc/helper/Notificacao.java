@@ -2,12 +2,8 @@ package com.example.christian.tcc.helper;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
-import com.example.christian.tcc.activitys.AgenteAcompActivity;
-import com.example.christian.tcc.activitys.AgenteMainActivity;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.google.firebase.database.DataSnapshot;

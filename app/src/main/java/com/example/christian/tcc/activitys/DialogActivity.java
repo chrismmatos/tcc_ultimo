@@ -3,6 +3,7 @@ package com.example.christian.tcc.activitys;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -67,7 +68,6 @@ public class DialogActivity extends AppCompatActivity {
                 });
 
         AlertDialog alert = dialog.create();
-
         alert.show();
 
         Button btnPositive = alert.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -75,9 +75,18 @@ public class DialogActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnPositive.getLayoutParams();
         layoutParams.weight = 10;
-        btnPositive.setLayoutParams(layoutParams);
-        btnNegative.setLayoutParams(layoutParams);
+        layoutParams.leftMargin = 10;
+        LinearLayout.LayoutParams layoutParamsNegative = (LinearLayout.LayoutParams) btnNegative.getLayoutParams();
+        layoutParamsNegative.weight = 10;
+        layoutParamsNegative.rightMargin = 10;
 
-        System.out.println("está rodadendo");
+        btnPositive.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnPositive.setTextColor(Color.WHITE);
+        btnNegative.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnNegative.setTextColor(Color.WHITE);
+
+        btnPositive.setLayoutParams(layoutParams);
+        btnNegative.setLayoutParams(layoutParamsNegative);
+
     }
 }

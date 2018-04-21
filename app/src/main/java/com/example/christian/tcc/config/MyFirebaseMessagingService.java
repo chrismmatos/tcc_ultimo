@@ -1,27 +1,17 @@
 package com.example.christian.tcc.config;
 
-import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
-import android.view.View;
 
 import com.example.christian.tcc.R;
-import com.example.christian.tcc.activitys.AgenteAcompActivity;
 import com.example.christian.tcc.activitys.AgenteMainActivity;
 import com.example.christian.tcc.activitys.DialogActivity;
 import com.example.christian.tcc.activitys.NotificationTransitionActivity;
@@ -29,8 +19,6 @@ import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

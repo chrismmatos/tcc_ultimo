@@ -85,7 +85,6 @@
         <activity
             android:name=".activitys.MapsAgenteActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".activitys.AgenteAcompActivity" />
         <activity android:name=".activitys.AgenteMainActivity" />
         <activity android:name=".activitys.DialogActivity" />
         <activity android:name=".activitys.NotificationTransitionActivity"></activity>

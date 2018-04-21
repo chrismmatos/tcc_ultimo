@@ -152,6 +152,7 @@ public class PdiMainActivity extends AppCompatActivity {
         refPedido.removeEventListener(pedidoListener);
         refPedido.removeValue();
         alerta.dismiss();
+        timer.cancel();
     }
 
 
@@ -208,6 +209,8 @@ public class PdiMainActivity extends AppCompatActivity {
                 if(pedido.isIniciado()) {
                     System.out.println("Alguém aceitou o pedido");
                     refPedido.removeEventListener(pedidoListener);
+                    alerta.dismiss();
+                    timer.cancel();
                 }
             }
             @Override
