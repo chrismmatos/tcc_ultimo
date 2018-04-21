@@ -9,20 +9,20 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
@@ -32,23 +32,17 @@ import com.example.christian.tcc.helper.Notificacao;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
 
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Calendar;
 
 
 import okhttp3.OkHttpClient;
@@ -56,30 +50,27 @@ import okhttp3.OkHttpClient;
 
 import static com.example.christian.tcc.activitys.LoginAct.mRootRef;
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
+import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class PdiMainActivity extends AppCompatActivity {
+    //tempo de espera em minutos
+    private final int TEMPO_ESPERA = 2;
 
     public static final String ADRESS ="https://fcm.googleapis.com/fcm/send";
-
     private FirebaseAuth mAuth;
     private Button btnPa;
 
     OkHttpClient mClient = new OkHttpClient();
-
     JSONObject dataNotification;
 
+    static public AlertDialog alerta;
     private DatabaseReference mUserRef = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
-
     private PedidoAcompanhamento pedido;
-
     private ValueEventListener pedidoListener;
-
     private  DatabaseReference refPedido;
-
     private String SENDER_ID = "cU1VUF5EAms:APA91bFH7WQ7dYJGmmM16aRjCUmBMPzA28OT9R8VTI5Z2O6sekFXOR9CuHli0C-qZkEpPm-vWgJYGayDuuzdxAUh4pkZ1hVu9na2CV2dTheL81FyBWm6uzyq0gQujwIPdkJBgSI8r9R7";
-
-
+    private MyCountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,37 +90,70 @@ public class PdiMainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         pedirPermissoes();
-
     }
 
-    void criaDialog(){
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pedido envidado!");
-        builder.setMessage("Localizando"+ " voluntários" + " próximos.");
-        builder.setCancelable(false);
+    public void criaDialog(){
+        //LayoutInflater é utilizado para inflar nosso layout em uma view.
+        //-pegamos nossa instancia da classe
+        LayoutInflater li = getLayoutInflater();
 
-        builder.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                pedido.setIniciado(true);
-                pedido.salvar();
-                refPedido.removeEventListener(pedidoListener);
-                refPedido.removeValue();
+        //inflamos o layout alerta.xml na view
+        View view = li.inflate(R.layout.dialog_layout, null);
+        TextView textView = view.findViewById(R.id.tv_timer);
+        timer = new MyCountDownTimer(this, textView,  TEMPO_ESPERA *60*1000, 1000);
+        timer.start();
+        //definimos para o botão do layout um clickListener
+        view.findViewById(R.id.btn_cancelar).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                cancelaPedido();
             }
         });
 
-        AlertDialog alert = builder.create();
-        alert.show();
-        alert.getButton(AlertDialog.BUTTON_NEGATIVE).setGravity(Gravity.CENTER_HORIZONTAL);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pedido enviado!");
+        builder.setView(view);
+        alerta = builder.create();
+        alerta.show();
+    }
 
-        Button btnNegative= alert.getButton(android.app.AlertDialog.BUTTON_NEGATIVE);
-        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNegative.getLayoutParams();
-        layoutParams.weight = 12;
-        btnNegative.setLayoutParams(layoutParams);
-        btnNegative.setTextColor(Color.MAGENTA);
+    public void expiraPedido(){
+
+        android.app.AlertDialog.Builder dialog;
+
+        //configurar dialog
+        dialog = new android.app.AlertDialog.Builder(this);
+        dialog.setTitle("Tempo limite atingido!");
+
+        //configurar mensagem
+        dialog.setMessage("O tempo de limite de espera foi atingido. Você pode realizar o pedido novamente agora ou mais tarde");
+        dialog.setCancelable(false);
+
+        dialog.setNeutralButton("OK",null);
+
+        android.app.AlertDialog alert = dialog.create();
+        alert.show();
+
+        Button btnNeutral = alert.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
+
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNeutral.getLayoutParams();
+        layoutParams.gravity = Gravity.CENTER;
+        layoutParams.weight = 40;
+        btnNeutral.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnNeutral.setTextColor(Color.WHITE);
+        btnNeutral.setLayoutParams(layoutParams);
 
     }
+
+
+    public  void cancelaPedido(){
+        pedido.setIniciado(true);
+        pedido.salvar();
+        refPedido.removeEventListener(pedidoListener);
+        refPedido.removeValue();
+        alerta.dismiss();
+    }
+
 
     public void enviaPa()  {
 
@@ -170,7 +194,6 @@ public class PdiMainActivity extends AppCompatActivity {
         });
 
         verificaPedido();
-
         criaDialog();
     }
 
@@ -187,7 +210,6 @@ public class PdiMainActivity extends AppCompatActivity {
                     refPedido.removeEventListener(pedidoListener);
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -288,6 +310,49 @@ public class PdiMainActivity extends AppCompatActivity {
             usuarioLogado.setLatitude(latPoint);
             usuarioLogado.setLongitude(lngPoint);
             usuarioLogado.salvar();
+        }
+    }
+
+
+
+
+    // Classe Contadora
+    public class MyCountDownTimer extends CountDownTimer {
+
+        private TextView tv;
+        private Context context;
+        private long timerInTure;
+
+        public MyCountDownTimer(Context context, TextView tv, long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+            this.context = context;
+            this.tv = tv;
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            timerInTure = millisUntilFinished;
+            tv.setText( "Procurando agentes próximos...\n"
+                    +getCorrectTimer(true, millisUntilFinished)+ ":" + getCorrectTimer(false, millisUntilFinished) );
+        }
+
+        @Override
+        public void onFinish() {
+            timerInTure -= 1000;
+            tv.setText( "Procurando agentes próximos...\n"
+                    +getCorrectTimer(true, timerInTure)+ ":" + getCorrectTimer(false, timerInTure) );
+            alerta.dismiss();
+            cancelaPedido();
+            expiraPedido();
+        }
+
+        private String getCorrectTimer(boolean isMinute, long millisUntilFinished){
+            String aux;
+            int constCalendar = isMinute ? Calendar.MINUTE : Calendar.SECOND;
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(millisUntilFinished);
+            aux = c.get(constCalendar) < 10 ? "0" +c.get(constCalendar) : "" + c.get(constCalendar);
+            return (aux);
         }
     }
 
