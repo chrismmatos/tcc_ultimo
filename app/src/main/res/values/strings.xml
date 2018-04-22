@@ -17,4 +17,5 @@
     <string name="title_activity_pdi_main">Usuário logado</string>
     <string name="title_activity_meu_local">Meu Local</string>
     <string name="title_activity_maps">Meu Local</string>
+    <string name="title_activity_acomp_pdi">Map</string>
 </resources>

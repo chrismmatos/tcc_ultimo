@@ -47,7 +47,7 @@ import java.util.Map;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
-public class MapsAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
 

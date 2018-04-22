@@ -211,6 +211,10 @@ public class PdiMainActivity extends AppCompatActivity {
                     refPedido.removeEventListener(pedidoListener);
                     alerta.dismiss();
                     timer.cancel();
+                    Intent i = new Intent(PdiMainActivity.this, AcompPDIActivity.class);
+                    i.putExtra("pedido",pedido);
+                    startActivity(i);
+                    finish();
                 }
             }
             @Override

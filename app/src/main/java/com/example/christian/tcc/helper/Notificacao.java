@@ -91,8 +91,10 @@ public class Notificacao {
                         aceito = true;
                 }
 
-                else
+                else {
                     aceito = true;
+                    System.out.println("pedido nao está ativo");
+                }
 
             }
 

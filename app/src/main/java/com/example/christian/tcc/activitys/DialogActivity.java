@@ -52,7 +52,7 @@ public class DialogActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(!Notificacao.isAceito(DialogActivity.this)){
-                            Intent aceitar = new Intent(DialogActivity.this, MapsAgenteActivity.class);
+                            Intent aceitar = new Intent(DialogActivity.this, AcompAgenteActivity.class);
                             finish();
                             startActivity(aceitar);
                         }

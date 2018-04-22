@@ -83,11 +83,14 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".activitys.MapsAgenteActivity"
+            android:name=".activitys.AcompAgenteActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".activitys.AgenteMainActivity" />
         <activity android:name=".activitys.DialogActivity" />
-        <activity android:name=".activitys.NotificationTransitionActivity"></activity>
+        <activity android:name=".activitys.NotificationTransitionActivity" />
+        <activity
+            android:name=".activitys.AcompPDIActivity"
+            android:label="@string/title_activity_acomp_pdi"></activity>
     </application>
 
 </manifest>

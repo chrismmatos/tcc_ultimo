@@ -16,7 +16,7 @@ public class NotificationTransitionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_transition);
 
         if(!Notificacao.isAceito(NotificationTransitionActivity.this)){
-            Intent aceitar = new Intent(NotificationTransitionActivity.this, MapsAgenteActivity.class);
+            Intent aceitar = new Intent(NotificationTransitionActivity.this, AcompAgenteActivity.class);
             finish();
             startActivity(aceitar);
         }
