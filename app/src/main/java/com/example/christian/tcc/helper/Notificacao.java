@@ -81,9 +81,9 @@ public class Notificacao {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null) {
                     pedidoAtual = dataSnapshot.getValue(PedidoAcompanhamento.class);
-                    if (!pedidoAtual.isIniciado()) {
+                    if (!pedidoAtual.isAtivo()) {
                         pedidoAtual.setAcompanhante(usuarioLogado.getId());
-                        pedidoAtual.setIniciado(true);
+                        pedidoAtual.setAtivo(true);
                         pedidoAtual.salvar();
                         aceito = false;
                     }

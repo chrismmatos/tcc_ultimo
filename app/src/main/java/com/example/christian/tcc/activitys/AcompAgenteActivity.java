@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,14 +15,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
-import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,16 +34,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
 
-import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
 public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
@@ -53,21 +48,18 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
 
     private Marker currentLocationMaker;
     private Marker userLocationMaker;
-
     private LatLng currentLocationLatLong;
 
-
     private DatabaseReference refUser;
-
     private Usuario usuarioAcompanhado;
+    private boolean consultou = false;
 
     AlertDialog.Builder builder;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_agent_acomp);
 
         refUser = ConfiguracaoFirebase.getFirebaseDatabase();
         String caminho = "usuarios/"+pedidoAtual.getUsuario();
@@ -80,7 +72,6 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         startGettingLocations();
         getMarkers();
 
-        criaDialog();
     }
 
     private void getMarkers(){
@@ -91,6 +82,12 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
                     usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
                     LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
                     addGreenMarker(latLng);
+
+                    criaDialog();
+                    int metros = (int) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
+                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
+
+                    System.out.println("Distância "+metros);
                 }
             }
 
@@ -104,7 +101,7 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
     void criaDialog(){
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido aceito");
-        builder.setMessage("Dirija-se até o usuário"+" para iniciar o acompanhamento");
+        builder.setMessage("Dirija-se até "+ usuarioAcompanhado.getNome()+ " para iniciar o acompanhamento");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
@@ -114,8 +111,11 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         Button btnNeutral= alert.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
 
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNeutral.getLayoutParams();
-        layoutParams.weight = 10;
+        layoutParams.weight = 100;
+        layoutParams.gravity = Gravity.CENTER;
         btnNeutral.setLayoutParams(layoutParams);
+        btnNeutral.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnNeutral.setTextColor(Color.WHITE);
     }
 
 
@@ -153,15 +153,13 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         currentLocationMaker = mMap.addMarker(markerOptions);
 
         //Move to new location
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        //CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
+        // mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
         getMarkers();
 
     }
-
-
 
     private ArrayList findUnAskedPermissions(ArrayList<String> wanted) {
         ArrayList result = new ArrayList();
@@ -283,9 +281,28 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(usuarioAcompanhado.getNome());
+        markerOptions.title("Localização da solicitação");
+        markerOptions.snippet(usuarioAcompanhado.getNome() + ": Deficiência: "+ usuarioAcompanhado.getTipoPCD());
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         userLocationMaker = mMap.addMarker(markerOptions);
+        //Move to new location
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private float distanceBetween(double lat1, double lng1, double lat2, double lng2) {
+
+        Location loc1 = new Location(LocationManager.GPS_PROVIDER);
+        Location loc2 = new Location(LocationManager.GPS_PROVIDER);
+
+        loc1.setLatitude(lat1);
+        loc1.setLongitude(lng1);
+
+        loc2.setLatitude(lat2);
+        loc2.setLongitude(lng2);
+
+
+        return loc1.distanceTo(loc2);
     }
 
 

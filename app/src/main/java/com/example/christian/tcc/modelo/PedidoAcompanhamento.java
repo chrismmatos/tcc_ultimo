@@ -9,11 +9,21 @@ public class PedidoAcompanhamento implements Serializable {
     private String id ;
     private String usuario;
     private String acompanhante = "";
-    private boolean isIniciado = false;
+    private boolean ativo = false;
+    private boolean concluido = false;
+    private String localizacao = "";
 
     public PedidoAcompanhamento() {
 
 
+    }
+
+    public String getLocalizacao() {
+        return localizacao;
+    }
+
+    public void setLocalizacao(String localizacao) {
+        this.localizacao = localizacao;
     }
 
     public String getId() {
@@ -40,12 +50,20 @@ public class PedidoAcompanhamento implements Serializable {
         this.acompanhante = acompanhante;
     }
 
-    public boolean isIniciado() {
-        return isIniciado;
+    public boolean isAtivo() {
+        return ativo;
     }
 
-    public void setIniciado(boolean iniciado) {
-        isIniciado = iniciado;
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public boolean isConcluido() {
+        return concluido;
+    }
+
+    public void setConcluido(boolean concluido) {
+        this.concluido = concluido;
     }
 
     public void salvar(){
@@ -56,10 +74,11 @@ public class PedidoAcompanhamento implements Serializable {
     @Override
     public String toString() {
         return "PedidoAcompanhamento{" +
-                ", id='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", usuario='" + usuario + '\'' +
                 ", acompanhante='" + acompanhante + '\'' +
-                ", isIniciado=" + isIniciado +
+                ", ativo=" + ativo +
+                ", concluido=" + concluido +
                 '}';
     }
 }

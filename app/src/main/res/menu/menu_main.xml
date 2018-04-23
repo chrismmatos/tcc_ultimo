@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="br.com.luiztools.forcavendas.MainActivity">
     <item
-        android:id="@+id/action_exit"
+        android:id="@+id/exit_menu_antigo"
         android:orderInCategory="100"
         android:title="Sair" />
 </menu>

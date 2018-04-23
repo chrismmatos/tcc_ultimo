@@ -24,8 +24,6 @@ public class DialogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog);
 
-        LayoutInflater inflater = this.getLayoutInflater();
-
         //configurar dialog
         dialog = new AlertDialog.Builder(this);
 

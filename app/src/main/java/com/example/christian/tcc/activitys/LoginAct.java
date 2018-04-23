@@ -381,7 +381,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                             case "Pessoa com deficiência": {
                                 tipoPCD = spnTipoPcd.getSelectedItem().toString();
-                                novoUsuario.setTipoAgente(tipoPCD);
+                                novoUsuario.setTipoPCD(tipoPCD);
                                 break;
                             }
 

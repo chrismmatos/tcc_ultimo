@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,7 +15,6 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -35,16 +35,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
-
-import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 
 
 public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
@@ -62,7 +56,7 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_acomp_pdi);
 
         pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
 
@@ -89,6 +83,7 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
+
         getMarkers();
 
         criaDialog();
@@ -125,8 +120,11 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         Button btnNeutral= alert.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
 
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNeutral.getLayoutParams();
-        layoutParams.weight = 10;
+        layoutParams.weight = 100;
+        layoutParams.gravity = Gravity.CENTER;
         btnNeutral.setLayoutParams(layoutParams);
+        btnNeutral.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnNeutral.setTextColor(Color.WHITE);
     }
 
 
@@ -163,7 +161,6 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
-        getMarkers();
 
     }
 
@@ -289,7 +286,8 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(acompanhante.getNome());
+        markerOptions.title("Localização do acompanhante");
+        markerOptions.snippet(acompanhante.getTipoUsuario()+ ": "+acompanhante.getNome() +" "+acompanhante.getTipoAgente());
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         acompLocationMaker = mMap.addMarker(markerOptions);
     }

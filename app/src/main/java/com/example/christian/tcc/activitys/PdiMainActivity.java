@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -42,7 +44,10 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 
 import okhttp3.OkHttpClient;
@@ -147,7 +152,7 @@ public class PdiMainActivity extends AppCompatActivity {
 
 
     public  void cancelaPedido(){
-        pedido.setIniciado(true);
+        pedido.setAtivo(true);
         pedido.salvar();
         refPedido.removeEventListener(pedidoListener);
         refPedido.removeValue();
@@ -163,6 +168,7 @@ public class PdiMainActivity extends AppCompatActivity {
 
         pedido.setId(idPedido);
         pedido.setUsuario(usuarioLogado.getId());
+        buscaEndereco();
         pedido.salvar();
 
        dataNotification = new JSONObject();
@@ -171,6 +177,7 @@ public class PdiMainActivity extends AppCompatActivity {
             dataNotification.put("id",pedido.getId());
             dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
             dataNotification.put("titulo", "Pedido de Acompannhamento");
+            dataNotification.put("localizacao", pedido.getLocalizacao());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -193,7 +200,6 @@ public class PdiMainActivity extends AppCompatActivity {
                 //Se ocorrer um erro
             }
         });
-
         verificaPedido();
         criaDialog();
     }
@@ -206,7 +212,7 @@ public class PdiMainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 pedido = dataSnapshot.getValue(PedidoAcompanhamento.class);
 
-                if(pedido.isIniciado()) {
+                if(pedido.isAtivo()) {
                     System.out.println("Alguém aceitou o pedido");
                     refPedido.removeEventListener(pedidoListener);
                     alerta.dismiss();
@@ -227,7 +233,7 @@ public class PdiMainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_pdi, menu);
         return true;
     }
 
@@ -320,8 +326,24 @@ public class PdiMainActivity extends AppCompatActivity {
         }
     }
 
+    public void buscaEndereco(){
+        String rua = null;
+        String address = null;
 
+        List<Address> addresses;
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(),1);
+            rua = addresses.get(0).getThoroughfare();
+            address = addresses.get(0).getAddressLine(0);// rua numero e bairro
+            System.out.println("Endereço " + address);
+            pedido.setLocalizacao(address);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     // Classe Contadora
     public class MyCountDownTimer extends CountDownTimer {
