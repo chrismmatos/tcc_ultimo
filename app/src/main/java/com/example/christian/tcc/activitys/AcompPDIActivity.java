@@ -59,6 +59,7 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         setContentView(R.layout.activity_acomp_pdi);
 
         pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
+        acompanhante = (Usuario) getIntent().getSerializableExtra("acompanhante");
 
         refAcomp = ConfiguracaoFirebase.getFirebaseDatabase();
         DatabaseReference pedidoRef = refAcomp.child("pedidos").child(pedidoAtual.getId());
@@ -107,10 +108,10 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         });
     }
 
-    synchronized  void  criaDialog(){
+      void  criaDialog(){
         builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pedido aceito");
-        builder.setMessage("Aguarde enquanto o acompanhante vai até" +" vai até você.");
+        builder.setTitle(acompanhante.getTipoAgente()+ " "+ acompanhante.getNome()+" aceitou seu pedido!");
+        builder.setMessage("Aguarde enquanto ele vai até você.");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();

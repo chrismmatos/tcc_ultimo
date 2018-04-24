@@ -27,9 +27,7 @@ public class Usuario implements Serializable {
     private Double longitude = 0.0;
     private String token = "";
 
-    private DatabaseReference mRootRef;
-
-    public Usuario(){        mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();}
+    public Usuario(){ }
 
     public String getToken() {
         return token;
@@ -136,6 +134,7 @@ public class Usuario implements Serializable {
     }
 
     public void salvar(){
+        DatabaseReference mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mRootRef.child("usuarios").child(id).setValue(this);
     }
 

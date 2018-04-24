@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.helper.Notificacao;
 
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 
 public class DialogActivity extends AppCompatActivity {
@@ -51,6 +52,7 @@ public class DialogActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(!Notificacao.isAceito(DialogActivity.this)){
                             Intent aceitar = new Intent(DialogActivity.this, AcompAgenteActivity.class);
+                            aceitar.putExtra("usuario",usuarioLogado);
                             finish();
                             startActivity(aceitar);
                         }

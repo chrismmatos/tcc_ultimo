@@ -8,6 +8,8 @@ import android.widget.Toast;
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.helper.Notificacao;
 
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
+
 public class NotificationTransitionActivity extends AppCompatActivity {
 
     @Override
@@ -17,6 +19,7 @@ public class NotificationTransitionActivity extends AppCompatActivity {
 
         if(!Notificacao.isAceito(NotificationTransitionActivity.this)){
             Intent aceitar = new Intent(NotificationTransitionActivity.this, AcompAgenteActivity.class);
+            aceitar.putExtra("usuario",usuarioLogado);
             finish();
             startActivity(aceitar);
         }

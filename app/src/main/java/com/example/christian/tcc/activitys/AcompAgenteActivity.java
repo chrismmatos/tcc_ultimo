@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
+import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,7 +40,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
+
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
 public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
@@ -52,7 +53,7 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
 
     private DatabaseReference refUser;
     private Usuario usuarioAcompanhado;
-    private boolean consultou = false;
+    private Usuario usuarioLogado;
 
     AlertDialog.Builder builder;
 
@@ -60,6 +61,8 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agent_acomp);
+
+        usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
 
         refUser = ConfiguracaoFirebase.getFirebaseDatabase();
         String caminho = "usuarios/"+pedidoAtual.getUsuario();
@@ -70,9 +73,31 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
-        getMarkers();
-
+        carregaUsuario();
     }
+
+    public void carregaUsuario(){
+        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null) {
+                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
+                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
+                    addGreenMarker(latLng);
+
+                    criaDialog();
+                    double metros = distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
+                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
+                    System.out.println("Distância "+metros);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     private void getMarkers(){
         refUser.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -83,14 +108,13 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
                     LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
                     addGreenMarker(latLng);
 
-                    criaDialog();
                     int metros = (int) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
-
                     System.out.println("Distância "+metros);
+
+                    usuarioLogado.salvar();
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -157,6 +181,8 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         // mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
+        usuarioLogado.setLatitude(location.getLatitude());
+        usuarioLogado.setLongitude(location.getLongitude());
         getMarkers();
 
     }
@@ -291,7 +317,6 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private float distanceBetween(double lat1, double lng1, double lat2, double lng2) {
-
         Location loc1 = new Location(LocationManager.GPS_PROVIDER);
         Location loc2 = new Location(LocationManager.GPS_PROVIDER);
 
@@ -300,8 +325,6 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
 
         loc2.setLatitude(lat2);
         loc2.setLongitude(lng2);
-
-
         return loc1.distanceTo(loc2);
     }
 

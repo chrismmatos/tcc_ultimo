@@ -118,6 +118,7 @@ public class PdiMainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido enviado!");
         builder.setView(view);
+        builder.setCancelable(false);
         alerta = builder.create();
         alerta.show();
     }
@@ -213,14 +214,29 @@ public class PdiMainActivity extends AppCompatActivity {
                 pedido = dataSnapshot.getValue(PedidoAcompanhamento.class);
 
                 if(pedido.isAtivo()) {
-                    System.out.println("Alguém aceitou o pedido");
                     refPedido.removeEventListener(pedidoListener);
                     alerta.dismiss();
                     timer.cancel();
-                    Intent i = new Intent(PdiMainActivity.this, AcompPDIActivity.class);
+                    final Intent i = new Intent(PdiMainActivity.this, AcompPDIActivity.class);
                     i.putExtra("pedido",pedido);
-                    startActivity(i);
-                    finish();
+
+                    refPedido = mRootRef.child("usuarios").child(pedido.getAcompanhante());
+
+                    refPedido.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Usuario acompanhante = dataSnapshot.getValue(Usuario.class);
+                            i.putExtra("acompanhante",acompanhante);
+                            startActivity(i);
+                            finish();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             }
             @Override
