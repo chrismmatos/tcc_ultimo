@@ -12,9 +12,9 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.christian.tcc.R;
-import com.example.christian.tcc.activitys.AgenteMainActivity;
-import com.example.christian.tcc.activitys.DialogActivity;
-import com.example.christian.tcc.activitys.NotificationTransitionActivity;
+import com.example.christian.tcc.activitys.agente.AgenteMainActivity;
+import com.example.christian.tcc.activitys.agente.DialogActivity;
+import com.example.christian.tcc.activitys.agente.NotificationTransitionActivity;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;

@@ -21,24 +21,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.activitys.agente.AgenteMainActivity;
+import com.example.christian.tcc.activitys.pdi.PdiMainActivity;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,7 +48,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -58,7 +55,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -121,29 +117,26 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
         NotificationManager notifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notifyManager.cancelAll();
 
-
         //recupera referências
         mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mUserRef = mRootRef.child("usuarios");
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
         user = mAuth.getCurrentUser();
-
-        //verifica se o usuário está logado
-        if (user != null)
-            isUsuarioLogado();
-
-
+        mLoginFormView = findViewById(R.id.login_form);
+        mProgressView = findViewById(R.id.login_progress);
         edtNome = findViewById(R.id.txt_edt_nome);
         spnTipoAgente = findViewById(R.id.spinner_tipo_agente);
         spnTipoPcd = findViewById(R.id.spinner_tipo_pcd);
         spnTipoUsuario = findViewById(R.id.spinnerTipoUsuario);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
+        //verifica se o usuário está logado
+        if (user != null)
+            isUsuarioLogado();
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
-
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -173,13 +166,11 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
     }
 
     public void isUsuarioLogado(){
 
+        showProgress(true);
         Query query = mUserRef.orderByChild("email").equalTo(user.getEmail()).limitToFirst(1);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -195,6 +186,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                         case "Pessoa com deficiência": {
                             startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            showProgress(false);
                             finish();
                             break;
                         }
@@ -202,6 +194,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                         case "Idoso": {
                             startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            showProgress(false);
                             finish();
                             break;
                         }
@@ -210,6 +203,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                             FirebaseMessaging.getInstance().subscribeToTopic("agentes");
                             startActivity(new Intent(LoginAct.this, AgenteMainActivity.class));
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            showProgress(false);
                             finish();
                         }
 

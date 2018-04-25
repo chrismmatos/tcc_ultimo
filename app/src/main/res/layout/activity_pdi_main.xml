@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.christian.tcc.activitys.PdiMainActivity"
+    tools:context="com.example.christian.tcc.activitys.pdi.PdiMainActivity"
     tools:layout_gravity="center_vertical|center_horizontal">
 
     <android.support.design.widget.AppBarLayout

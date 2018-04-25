@@ -1,4 +1,4 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.agente;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +18,7 @@ public class NotificationTransitionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification_transition);
 
         if(!Notificacao.isAceito(NotificationTransitionActivity.this)){
-            Intent aceitar = new Intent(NotificationTransitionActivity.this, AcompAgenteActivity.class);
+            Intent aceitar = new Intent(NotificationTransitionActivity.this, AgenteAcompActivity.class);
             aceitar.putExtra("usuario",usuarioLogado);
             finish();
             startActivity(aceitar);

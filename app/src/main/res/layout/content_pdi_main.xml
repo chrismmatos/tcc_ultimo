@@ -7,7 +7,7 @@
     android:accessibilityTraversalBefore="@+id/b"
     android:background="@color/common_google_signin_btn_text_dark_default"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.christian.tcc.activitys.PdiMainActivity"
+    tools:context="com.example.christian.tcc.activitys.pdi.PdiMainActivity"
     tools:layout_editor_absoluteY="81dp"
     tools:showIn="@layout/activity_pdi_main">
 

@@ -2,12 +2,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- botão pressionado -->
-    <item android:drawable="@color/colorLightBackgroundCancel" android:state_pressed="true"/>
 
     <!-- focado -->
-    <item android:drawable="@color/colorBackgroundCancel" android:state_focused="true"/>
 
     <!-- padrão -->
-    <item android:drawable="@color/colorBackgroundCancel"/>
 
+    <item android:state_pressed="true" android:drawable="@color/colorLightBackgroundCancel" />
+    <item android:state_focused="true" android:drawable="@color/colorBackgroundCancel" />
+    <item android:drawable="@color/colorBackgroundCancel" />
 </selector>

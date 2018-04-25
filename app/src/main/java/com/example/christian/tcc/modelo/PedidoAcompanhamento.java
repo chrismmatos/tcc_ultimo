@@ -12,10 +12,28 @@ public class PedidoAcompanhamento implements Serializable {
     private boolean ativo = false;
     private boolean concluido = false;
     private String localizacao = "";
+    private String data ="";
+    private String tipo = "";
 
     public PedidoAcompanhamento() {
 
 
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getLocalizacao() {

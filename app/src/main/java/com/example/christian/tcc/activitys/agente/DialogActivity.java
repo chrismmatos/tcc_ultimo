@@ -1,4 +1,4 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.agente;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -51,7 +50,7 @@ public class DialogActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(!Notificacao.isAceito(DialogActivity.this)){
-                            Intent aceitar = new Intent(DialogActivity.this, AcompAgenteActivity.class);
+                            Intent aceitar = new Intent(DialogActivity.this, AgenteAcompActivity.class);
                             aceitar.putExtra("usuario",usuarioLogado);
                             finish();
                             startActivity(aceitar);

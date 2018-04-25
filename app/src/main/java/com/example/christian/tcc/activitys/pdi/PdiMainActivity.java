@@ -1,8 +1,7 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.pdi;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -28,9 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.activitys.LoginAct;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
-import com.example.christian.tcc.helper.Notificacao;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,7 +44,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,7 +56,6 @@ import okhttp3.OkHttpClient;
 
 import static com.example.christian.tcc.activitys.LoginAct.mRootRef;
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
-import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
 import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class PdiMainActivity extends AppCompatActivity {
@@ -170,6 +170,7 @@ public class PdiMainActivity extends AppCompatActivity {
         pedido.setId(idPedido);
         pedido.setUsuario(usuarioLogado.getId());
         buscaEndereco();
+        pedido.setData(retornaHora());
         pedido.salvar();
 
        dataNotification = new JSONObject();
@@ -217,7 +218,7 @@ public class PdiMainActivity extends AppCompatActivity {
                     refPedido.removeEventListener(pedidoListener);
                     alerta.dismiss();
                     timer.cancel();
-                    final Intent i = new Intent(PdiMainActivity.this, AcompPDIActivity.class);
+                    final Intent i = new Intent(PdiMainActivity.this, PdiAcompActivity.class);
                     i.putExtra("pedido",pedido);
 
                     refPedido = mRootRef.child("usuarios").child(pedido.getAcompanhante());
@@ -358,7 +359,16 @@ public class PdiMainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public String retornaHora(){
+        String hora;
+        Date dataHoraAtual = new Date();
+        hora =  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataHoraAtual);
+
+        System.out.println ("hora atual " + hora);
+
+        return hora;
     }
 
     // Classe Contadora

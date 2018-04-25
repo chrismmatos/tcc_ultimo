@@ -1,4 +1,4 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.agente;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,8 +15,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
@@ -38,46 +40,53 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
-public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
+
+public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+
+    private TextView tvDescricao;
+    private TextView tvDistancia;
+    private TextView tvData;
+    private TextView tvEndereco;
+    private Button btnCancelar;
+
     private GoogleMap mMap;
     private Marker currentLocationMaker;
-    private Marker acompLocationMaker;
+    private Marker userLocationMaker;
     private LatLng currentLocationLatLong;
-    private DatabaseReference refAcomp;
-    private Usuario acompanhante;
-    private PedidoAcompanhamento pedidoAtual;
+
+    private DatabaseReference refUser;
+    private Usuario usuarioAcompanhado;
+    private Usuario usuarioLogado;
 
     AlertDialog.Builder builder;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_acomp_pdi);
+        setContentView(R.layout.activity_agent_acomp);
 
-        pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
-        acompanhante = (Usuario) getIntent().getSerializableExtra("acompanhante");
-
-        refAcomp = ConfiguracaoFirebase.getFirebaseDatabase();
-        DatabaseReference pedidoRef = refAcomp.child("pedidos").child(pedidoAtual.getId());
-        pedidoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        tvData = (TextView) findViewById(R.id.tv_data);
+        tvDescricao = (TextView) findViewById(R.id.tv_descricao);
+        tvDistancia = (TextView) findViewById(R.id.tv_distancia);
+        tvEndereco = (TextView) findViewById(R.id.tv_endereco);
+        btnCancelar = (Button) findViewById(R.id.btn_cancelar_pedido_agente);
+        btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue()!=null)
-                    pedidoAtual = dataSnapshot.getValue(PedidoAcompanhamento.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onClick(View v) {
+                cancelaPedido(v);
             }
         });
 
-        String caminho = "usuarios/"+pedidoAtual.getAcompanhante();
-        refAcomp = refAcomp.child(caminho);
+        usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
+        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
+        String caminho = "usuarios/"+pedidoAtual.getUsuario();
+        refUser = refUser.child(caminho);
+        carregaUsuario();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -85,22 +94,41 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
         startGettingLocations();
 
-        getMarkers();
-
-        criaDialog();
     }
 
-    private void getMarkers(){
-        refAcomp.addValueEventListener(new ValueEventListener() {
+    private void cancelaPedido(View view){
+        pedidoAtual.setAtivo(false);
+        pedidoAtual.salvar();
+        startActivity(new Intent (this, AgenteMainActivity.class));
+        finish();
+    }
+
+    public void carregaUsuario(){
+        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null) {
-                    acompanhante = dataSnapshot.getValue(Usuario.class);
-                    LatLng latLng = new LatLng(acompanhante.getLatitude(), acompanhante.getLongitude());
+                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
+                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
                     addGreenMarker(latLng);
+
+                    DecimalFormat df = new DecimalFormat("###,##0.00");
+
+                    double distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
+                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
+
+                    tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
+                            usuarioAcompanhado.getTipoPCD() +") precisa de ajuda");
+                    tvDistancia.setText(df.format(distancia) + " metros");
+
+                    tvEndereco.setText(pedidoAtual.getLocalizacao());
+                    tvData.setText(pedidoAtual.getData());
+
+                    criaDialog();
+
+                    System.out.println("Distância "+distancia);
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -108,10 +136,38 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         });
     }
 
-      void  criaDialog(){
+
+    private void getMarkers(){
+        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null) {
+                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
+                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
+                    addGreenMarker(latLng);
+
+                    DecimalFormat df = new DecimalFormat("###,##0.00");
+                    float distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
+                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
+                    tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
+                            usuarioAcompanhado.getTipoPCD() +") precisa de ajuda");
+
+                    tvDistancia.setText(df.format(distancia) + " metros");
+
+                    usuarioLogado.salvar();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    void criaDialog(){
         builder = new AlertDialog.Builder(this);
-        builder.setTitle(acompanhante.getTipoAgente()+ " "+ acompanhante.getNome()+" aceitou seu pedido!");
-        builder.setMessage("Aguarde enquanto ele vai até você.");
+        builder.setTitle("Pedido aceito");
+        builder.setMessage("Dirija-se até "+ usuarioAcompanhado.getNome()+ " para iniciar o acompanhamento");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
@@ -141,6 +197,11 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        // LatLng recife = new LatLng(-8.065638, -34.891130);
+        //mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
+
+        //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -158,14 +219,15 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
         currentLocationMaker = mMap.addMarker(markerOptions);
 
         //Move to new location
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        //CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
+        // mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
+        usuarioLogado.setLatitude(location.getLatitude());
+        usuarioLogado.setLongitude(location.getLongitude());
+        getMarkers();
 
     }
-
-
 
     private ArrayList findUnAskedPermissions(ArrayList<String> wanted) {
         ArrayList result = new ArrayList();
@@ -282,15 +344,30 @@ public class AcompPDIActivity extends FragmentActivity implements OnMapReadyCall
 
 
     private void addGreenMarker( LatLng latLng) {
-        if (acompLocationMaker != null) {
-            acompLocationMaker.remove();
+        if (userLocationMaker != null) {
+            userLocationMaker.remove();
         }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Localização do acompanhante");
-        markerOptions.snippet(acompanhante.getTipoUsuario()+ ": "+acompanhante.getNome() +" "+acompanhante.getTipoAgente());
+        markerOptions.title("Localização da solicitação");
+        markerOptions.snippet(usuarioAcompanhado.getNome() + ": Deficiência: "+ usuarioAcompanhado.getTipoPCD());
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        acompLocationMaker = mMap.addMarker(markerOptions);
+        userLocationMaker = mMap.addMarker(markerOptions);
+        //Move to new location
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private float distanceBetween(double lat1, double lng1, double lat2, double lng2) {
+        Location loc1 = new Location(LocationManager.GPS_PROVIDER);
+        Location loc2 = new Location(LocationManager.GPS_PROVIDER);
+
+        loc1.setLatitude(lat1);
+        loc1.setLongitude(lng1);
+
+        loc2.setLatitude(lat2);
+        loc2.setLongitude(lng2);
+        return loc1.distanceTo(loc2);
     }
 
 

@@ -67,7 +67,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activitys.PdiMainActivity"
+            android:name=".activitys.pdi.PdiMainActivity"
             android:label="SafeFollowing"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -83,13 +83,13 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".activitys.AcompAgenteActivity"
+            android:name=".activitys.agente.AgenteAcompActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".activitys.AgenteMainActivity" />
-        <activity android:name=".activitys.DialogActivity" />
-        <activity android:name=".activitys.NotificationTransitionActivity" />
+        <activity android:name=".activitys.agente.AgenteMainActivity" />
+        <activity android:name=".activitys.agente.DialogActivity" />
+        <activity android:name=".activitys.agente.NotificationTransitionActivity" />
         <activity
-            android:name=".activitys.AcompPDIActivity"
+            android:name=".activitys.pdi.PdiAcompActivity"
             android:label="@string/title_activity_acomp_pdi"></activity>
     </application>
 

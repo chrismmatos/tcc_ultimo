@@ -1,4 +1,4 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.agente;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.activitys.LoginAct;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
@@ -28,6 +29,8 @@ import com.example.christian.tcc.config.MyFirebaseMessagingService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.w3c.dom.Text;
 
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 
@@ -39,6 +42,7 @@ public class AgenteMainActivity extends AppCompatActivity {
     private TextView txtReceberPedidos;
     private FirebaseAuth mAuth;
     private boolean clicou = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

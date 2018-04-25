@@ -1,4 +1,4 @@
-package com.example.christian.tcc.activitys;
+package com.example.christian.tcc.activitys.pdi;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -41,80 +41,82 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 
-import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
-
-public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
-
+public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
     private GoogleMap mMap;
-
     private Marker currentLocationMaker;
-    private Marker userLocationMaker;
+    private Marker acompLocationMaker;
     private LatLng currentLocationLatLong;
-
-    private DatabaseReference refUser;
-    private Usuario usuarioAcompanhado;
-    private Usuario usuarioLogado;
+    private DatabaseReference refAcomp;
+    private Usuario acompanhante;
+    private PedidoAcompanhamento pedidoAtual;
+    private ValueEventListener pedidoListener;
 
     AlertDialog.Builder builder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_agent_acomp);
+        setContentView(R.layout.activity_acomp_pdi);
 
-        usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
-
-        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
-        String caminho = "usuarios/"+pedidoAtual.getUsuario();
-        refUser = refUser.child(caminho);
+        pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
+        acompanhante = (Usuario) getIntent().getSerializableExtra("acompanhante");
+        refAcomp = ConfiguracaoFirebase.getFirebaseDatabase();
+        String caminho = "usuarios/"+pedidoAtual.getAcompanhante();
+        refAcomp = refAcomp.child(caminho);
+        verificaPedido();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
-        carregaUsuario();
+
+        getMarkers();
+        criaDialog();
+        verificaPedido();
     }
 
-    public void carregaUsuario(){
-        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void verificaPedido(){
+        final DatabaseReference pedidoRef = ConfiguracaoFirebase.getFirebaseDatabase().child("pedidos").child(pedidoAtual.getId());
+        pedidoListener = pedidoRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue()!=null) {
-                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
-                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
-                    addGreenMarker(latLng);
+                if(dataSnapshot.getValue()!=null){
+                    pedidoAtual = dataSnapshot.getValue(PedidoAcompanhamento.class);
 
-                    criaDialog();
-                    double metros = distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
-                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
-                    System.out.println("Distância "+metros);
+                    if(!pedidoAtual.isAtivo()){
+                        startActivity(new Intent(PdiAcompActivity.this, PdiMainActivity.class));
+                        finish();
+                        Toast.makeText(getApplicationContext(),
+                                "O acompanhamento foi cancelado! Você pode realizar um novo pedido.", Toast.LENGTH_LONG).show();
+                        pedidoRef.removeEventListener(pedidoListener);
+                        pedidoRef.removeValue();
+                    }
+
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-    }
 
+
+    }
 
     private void getMarkers(){
-        refUser.addListenerForSingleValueEvent(new ValueEventListener() {
+        refAcomp.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null) {
-                    usuarioAcompanhado = dataSnapshot.getValue(Usuario.class);
-                    LatLng latLng = new LatLng(usuarioAcompanhado.getLatitude(), usuarioAcompanhado.getLongitude());
+                    acompanhante = dataSnapshot.getValue(Usuario.class);
+                    LatLng latLng = new LatLng(acompanhante.getLatitude(), acompanhante.getLongitude());
                     addGreenMarker(latLng);
-
-                    int metros = (int) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
-                            usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
-                    System.out.println("Distância "+metros);
-
-                    usuarioLogado.salvar();
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -122,10 +124,10 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         });
     }
 
-    void criaDialog(){
+      void  criaDialog(){
         builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pedido aceito");
-        builder.setMessage("Dirija-se até "+ usuarioAcompanhado.getNome()+ " para iniciar o acompanhamento");
+        builder.setTitle(acompanhante.getTipoAgente()+ " "+ acompanhante.getNome()+" aceitou seu pedido!");
+        builder.setMessage("Aguarde enquanto ele vai até você.");
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
@@ -155,11 +157,6 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // LatLng recife = new LatLng(-8.065638, -34.891130);
-        //mMap.addMarker(new MarkerOptions().position(recife).title("Marcador em Recife"));
-
-        //mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -177,15 +174,14 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
         currentLocationMaker = mMap.addMarker(markerOptions);
 
         //Move to new location
-        //CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
-        // mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(currentLocationLatLong).build();
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
-        usuarioLogado.setLatitude(location.getLatitude());
-        usuarioLogado.setLongitude(location.getLongitude());
-        getMarkers();
 
     }
+
+
 
     private ArrayList findUnAskedPermissions(ArrayList<String> wanted) {
         ArrayList result = new ArrayList();
@@ -302,30 +298,15 @@ public class AcompAgenteActivity extends FragmentActivity implements OnMapReadyC
 
 
     private void addGreenMarker( LatLng latLng) {
-        if (userLocationMaker != null) {
-            userLocationMaker.remove();
+        if (acompLocationMaker != null) {
+            acompLocationMaker.remove();
         }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Localização da solicitação");
-        markerOptions.snippet(usuarioAcompanhado.getNome() + ": Deficiência: "+ usuarioAcompanhado.getTipoPCD());
+        markerOptions.title("Localização do acompanhante");
+        markerOptions.snippet(acompanhante.getTipoUsuario()+ ": "+acompanhante.getNome() +" "+acompanhante.getTipoAgente());
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-        userLocationMaker = mMap.addMarker(markerOptions);
-        //Move to new location
-        CameraPosition cameraPosition = new CameraPosition.Builder().zoom(15).target(latLng).build();
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-    }
-
-    private float distanceBetween(double lat1, double lng1, double lat2, double lng2) {
-        Location loc1 = new Location(LocationManager.GPS_PROVIDER);
-        Location loc2 = new Location(LocationManager.GPS_PROVIDER);
-
-        loc1.setLatitude(lat1);
-        loc1.setLongitude(lng1);
-
-        loc2.setLatitude(lat2);
-        loc2.setLongitude(lng2);
-        return loc1.distanceTo(loc2);
+        acompLocationMaker = mMap.addMarker(markerOptions);
     }
 
 
