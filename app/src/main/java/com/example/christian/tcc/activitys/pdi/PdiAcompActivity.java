@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -50,6 +51,9 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
     private Usuario acompanhante;
     private PedidoAcompanhamento pedidoAtual;
     private ValueEventListener pedidoListener;
+    private DatabaseReference pedidoRef;
+    private Button btnCancelaPedido ;
+    private Button btnConcluiPedido ;
 
     AlertDialog.Builder builder;
 
@@ -64,7 +68,23 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
         refAcomp = ConfiguracaoFirebase.getFirebaseDatabase();
         String caminho = "usuarios/"+pedidoAtual.getAcompanhante();
         refAcomp = refAcomp.child(caminho);
-        verificaPedido();
+        pedidoRef = ConfiguracaoFirebase.getFirebaseDatabase().child("pedidos").child(pedidoAtual.getId());
+
+        btnCancelaPedido = (Button) findViewById(R.id.btn_cancelar_pedido_pdi);
+        btnCancelaPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelaPedido(v);
+            }
+        });
+
+        btnConcluiPedido = (Button) findViewById(R.id.btn_concluir_pedido_pdi);
+        btnConcluiPedido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                concluiPedido(v);
+            }
+        });
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -72,13 +92,28 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
         startGettingLocations();
 
+
         getMarkers();
         criaDialog();
         verificaPedido();
     }
 
+    private void cancelaPedido(View v){
+        pedidoRef.removeValue();
+        startActivity(new Intent(PdiAcompActivity.this, PdiMainActivity.class));
+        finish();
+        Toast.makeText(getApplicationContext(),"Acompanhamento cancelado!", Toast.LENGTH_LONG).show();
+    }
+
+    private void concluiPedido(View v){
+        pedidoAtual.setConcluido(true);
+        pedidoAtual.salvar();
+        startActivity(new Intent(PdiAcompActivity.this, PdiMainActivity.class));
+        finish();
+        Toast.makeText(getApplicationContext(),"Acompanhamento concluído com sucesso", Toast.LENGTH_LONG).show();
+    }
+
     private void verificaPedido(){
-        final DatabaseReference pedidoRef = ConfiguracaoFirebase.getFirebaseDatabase().child("pedidos").child(pedidoAtual.getId());
         pedidoListener = pedidoRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -96,7 +131,6 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
 
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

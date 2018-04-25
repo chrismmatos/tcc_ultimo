@@ -22,7 +22,7 @@ public class Usuario implements Serializable {
     private String tipoPCD = "";
     private String nome = "";
     private String email = "";
-    private Integer numPas = 0;
+    private Integer acompanhamentosRealizados = 0;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
     private String token = "";
@@ -109,12 +109,12 @@ public class Usuario implements Serializable {
         this.email = email;
     }
 
-    public Integer getNumPas() {
-        return numPas;
+    public Integer getAcompanhamentosRealizados() {
+        return acompanhamentosRealizados;
     }
 
-    public void setNumPas(Integer numPas) {
-        this.numPas = numPas;
+    public void setAcompanhamentosRealizados(Integer acompanhamentosRealizados) {
+        this.acompanhamentosRealizados = acompanhamentosRealizados;
     }
 
     public Map <String, Object> toMap(){
@@ -126,7 +126,7 @@ public class Usuario implements Serializable {
         result.put("email",email);
         result.put("tipoAgente",tipoAgente);
         result.put("tipoPCD",tipoPCD);
-        result.put("numPas",numPas);
+        result.put("acompanhamentosRealizados",acompanhamentosRealizados);
         result.put("latitude",latitude);
         result.put("longitude",longitude);
 
@@ -136,6 +136,10 @@ public class Usuario implements Serializable {
     public void salvar(){
         DatabaseReference mRootRef = ConfiguracaoFirebase.getFirebaseDatabase();
         mRootRef.child("usuarios").child(id).setValue(this);
+    }
+
+    public void addAcomp(){
+        acompanhamentosRealizados ++;
     }
 
 }

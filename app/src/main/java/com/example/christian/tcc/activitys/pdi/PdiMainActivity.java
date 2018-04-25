@@ -171,6 +171,7 @@ public class PdiMainActivity extends AppCompatActivity {
         pedido.setUsuario(usuarioLogado.getId());
         buscaEndereco();
         pedido.setData(retornaHora());
+        pedido.setTipo("Acompanhamento");
         pedido.salvar();
 
        dataNotification = new JSONObject();
@@ -184,24 +185,26 @@ public class PdiMainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Query query = mUserRef.orderByChild("tipoUsuario").equalTo("Agente").limitToFirst(1);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+//        Query query = mUserRef.orderByChild("tipoUsuario").equalTo("Agente").limitToFirst(1);
+//        query.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//                if(dataSnapshot.getValue()!=null) {
+//                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
+//                    Usuario usuarioNotificado = child.getValue(Usuario.class);
+//                    sendNotification(usuarioNotificado.getToken(),dataNotification);
+//
+//                }
+//
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                //Se ocorrer um erro
+//            }
+//        });
 
-                if(dataSnapshot.getValue()!=null) {
-                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
-                    Usuario usuarioNotificado = child.getValue(Usuario.class);
-                    sendNotification(usuarioNotificado.getToken(),dataNotification);
-
-                }
-
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //Se ocorrer um erro
-            }
-        });
+        sendNotification("topics/voluntarios",dataNotification);
         verificaPedido();
         criaDialog();
     }

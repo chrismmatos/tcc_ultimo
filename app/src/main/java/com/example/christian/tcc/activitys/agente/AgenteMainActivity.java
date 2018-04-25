@@ -59,7 +59,6 @@ public class AgenteMainActivity extends AppCompatActivity {
         spnTipoAgente     = (Spinner) findViewById(R.id.spinner_agente);
         txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
         txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
-
         btnReceberPedidos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,7 +82,6 @@ public class AgenteMainActivity extends AppCompatActivity {
             txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
             clicou = true;
         }
-
         else {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("agentes");
             usuarioLogado.setToken("");
@@ -93,7 +91,6 @@ public class AgenteMainActivity extends AppCompatActivity {
             clicou = false;
 
         }
-
     }
 
     @Override

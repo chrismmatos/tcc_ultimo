@@ -60,6 +60,8 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     private LatLng currentLocationLatLong;
 
     private DatabaseReference refUser;
+    private DatabaseReference refPedido;
+    private ValueEventListener eventListener;
     private Usuario usuarioAcompanhado;
     private Usuario usuarioLogado;
 
@@ -81,11 +83,8 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                 cancelaPedido(v);
             }
         });
-
         usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
-        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
-        String caminho = "usuarios/"+pedidoAtual.getUsuario();
-        refUser = refUser.child(caminho);
+
         carregaUsuario();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -93,17 +92,49 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
+        verificaPedido();
+    }
 
+    private void verificaPedido(){
+        refPedido = ConfiguracaoFirebase.getFirebaseDatabase().child("pedidos").child(pedidoAtual.getId());
+        eventListener = refPedido.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null){
+                    pedidoAtual = dataSnapshot.getValue(PedidoAcompanhamento.class);
+
+                    if(pedidoAtual.isConcluido()){
+                        usuarioLogado.addAcomp();
+                        usuarioLogado.salvar();
+                        Toast.makeText(AgenteAcompActivity.this, "Parabéns! Você concluiu o atendimento!" ,Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                }
+                else{
+                    finish();
+                    Toast.makeText(AgenteAcompActivity.this, usuarioAcompanhado.getNome() + " cancelou o acompanhamento!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void cancelaPedido(View view){
         pedidoAtual.setAtivo(false);
         pedidoAtual.salvar();
-        startActivity(new Intent (this, AgenteMainActivity.class));
         finish();
     }
 
     public void carregaUsuario(){
+        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
+        String caminho = "usuarios/"+pedidoAtual.getUsuario();
+        refUser = refUser.child(caminho);
         refUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
