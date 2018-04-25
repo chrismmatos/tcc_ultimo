@@ -84,7 +84,6 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
     String nomeUsuario;
     FirebaseUser user;
 
-
     /**
      * Id to identity READ_CONTACTS permission request.
      */

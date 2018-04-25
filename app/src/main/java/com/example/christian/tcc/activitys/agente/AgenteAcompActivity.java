@@ -144,7 +144,6 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                     addGreenMarker(latLng);
 
                     DecimalFormat df = new DecimalFormat("###,##0.00");
-
                     double distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
 

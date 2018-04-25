@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
@@ -39,7 +40,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 
 
 public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
@@ -54,6 +58,8 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
     private DatabaseReference pedidoRef;
     private Button btnCancelaPedido ;
     private Button btnConcluiPedido ;
+    private TextView tvDistancia;
+    private TextView tvDescricao;
 
     AlertDialog.Builder builder;
 
@@ -70,6 +76,8 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
         refAcomp = refAcomp.child(caminho);
         pedidoRef = ConfiguracaoFirebase.getFirebaseDatabase().child("pedidos").child(pedidoAtual.getId());
 
+        tvDescricao = (TextView) findViewById(R.id.tv_descricao_pdi);
+        tvDistancia = (TextView) findViewById(R.id.tv_distancia_pdi);
         btnCancelaPedido = (Button) findViewById(R.id.btn_cancelar_pedido_pdi);
         btnCancelaPedido.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +99,6 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         startGettingLocations();
-
 
         getMarkers();
         criaDialog();
@@ -137,7 +144,6 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
 
-
     }
 
     private void getMarkers(){
@@ -146,6 +152,15 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!=null) {
                     acompanhante = dataSnapshot.getValue(Usuario.class);
+
+                    DecimalFormat df = new DecimalFormat("###,##0.00");
+                    double distancia = (float) distanceBetween(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(),
+                            acompanhante.getLatitude(),acompanhante.getLongitude());
+                    tvDistancia.setText(df.format(distancia) + " metros");
+
+                    tvDescricao.setText("O " + acompanhante.getTipoUsuario() + " " + acompanhante.getNome() +
+                            " aceitou sua solicitação e está indo ao seu encontro.");
+
                     LatLng latLng = new LatLng(acompanhante.getLatitude(), acompanhante.getLongitude());
                     addGreenMarker(latLng);
                 }
@@ -212,7 +227,6 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         Toast.makeText(this, "Localização atualizada", Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -343,6 +357,17 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
         acompLocationMaker = mMap.addMarker(markerOptions);
     }
 
+    private float distanceBetween(double lat1, double lng1, double lat2, double lng2) {
+        Location loc1 = new Location(LocationManager.GPS_PROVIDER);
+        Location loc2 = new Location(LocationManager.GPS_PROVIDER);
+
+        loc1.setLatitude(lat1);
+        loc1.setLongitude(lng1);
+
+        loc2.setLatitude(lat2);
+        loc2.setLongitude(lng2);
+        return loc1.distanceTo(loc2);
+    }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {

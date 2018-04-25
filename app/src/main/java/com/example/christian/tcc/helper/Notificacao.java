@@ -13,6 +13,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -46,7 +49,7 @@ public class Notificacao {
                     dataJson.put("body","Hi this is sent from device to device");
                     dataJson.put("title","dummy title");
                     //json.put("notification",dataJson);
-                    json.put("to","/topics/agentes");
+                    json.put("to",regToken);
                     json.put("priority","high");
                     json.put("data", dataNotification);
                     json.put ("android",ttl);
@@ -66,6 +69,16 @@ public class Notificacao {
             }
         }.execute();
 
+    }
+
+    public static String retornaHora(){
+        String hora;
+        Date dataHoraAtual = new Date();
+        hora =  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataHoraAtual);
+
+        System.out.println ("hora atual " + hora);
+
+        return hora;
     }
 
     public static boolean isAceito(final Context context){
@@ -97,7 +110,6 @@ public class Notificacao {
                 }
 
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 

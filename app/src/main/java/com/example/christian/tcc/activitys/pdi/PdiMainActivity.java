@@ -30,6 +30,7 @@ import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.LoginAct;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
+import com.example.christian.tcc.helper.Notificacao;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
@@ -151,7 +152,6 @@ public class PdiMainActivity extends AppCompatActivity {
 
     }
 
-
     public  void cancelaPedido(){
         pedido.setAtivo(true);
         pedido.salvar();
@@ -161,7 +161,6 @@ public class PdiMainActivity extends AppCompatActivity {
         timer.cancel();
     }
 
-
     public void enviaPa()  {
 
         pedido = new PedidoAcompanhamento();
@@ -170,7 +169,7 @@ public class PdiMainActivity extends AppCompatActivity {
         pedido.setId(idPedido);
         pedido.setUsuario(usuarioLogado.getId());
         buscaEndereco();
-        pedido.setData(retornaHora());
+        pedido.setData(Notificacao.retornaHora());
         pedido.setTipo("Acompanhamento");
         pedido.salvar();
 
@@ -204,7 +203,7 @@ public class PdiMainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        sendNotification("topics/voluntarios",dataNotification);
+        sendNotification("/topics/GuardaMunicipal",dataNotification);
         verificaPedido();
         criaDialog();
     }
@@ -356,7 +355,7 @@ public class PdiMainActivity extends AppCompatActivity {
             addresses = geocoder.getFromLocation(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(),1);
             rua = addresses.get(0).getThoroughfare();
             address = addresses.get(0).getAddressLine(0);// rua numero e bairro
-            System.out.println("Endereço " + address);
+            System.out.println("Endereço "+ address);
             pedido.setLocalizacao(address);
 
         } catch (IOException e) {
@@ -364,15 +363,6 @@ public class PdiMainActivity extends AppCompatActivity {
         }
     }
 
-    public String retornaHora(){
-        String hora;
-        Date dataHoraAtual = new Date();
-        hora =  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dataHoraAtual);
-
-        System.out.println ("hora atual " + hora);
-
-        return hora;
-    }
 
     // Classe Contadora
     public class MyCountDownTimer extends CountDownTimer {

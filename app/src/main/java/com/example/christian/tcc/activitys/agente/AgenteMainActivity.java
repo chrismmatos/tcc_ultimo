@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,15 +29,29 @@ import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
 import com.example.christian.tcc.config.MyFirebaseMessagingService;
+import com.example.christian.tcc.helper.Notificacao;
+import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import okhttp3.OkHttpClient;
+
+import static com.example.christian.tcc.activitys.LoginAct.mRootRef;
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
+import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class AgenteMainActivity extends AppCompatActivity {
+    OkHttpClient mClient = new OkHttpClient();
+    JSONObject dataNotification;
 
     private Button btnReceberPedidos;
     private Button btnSolicitarApoio;
@@ -42,6 +59,8 @@ public class AgenteMainActivity extends AppCompatActivity {
     private TextView txtReceberPedidos;
     private FirebaseAuth mAuth;
     private boolean clicou = true;
+    private String tipoAgente ="";
+    private PedidoAcompanhamento pedido;
 
 
     @Override
@@ -51,11 +70,10 @@ public class AgenteMainActivity extends AppCompatActivity {
 
         NotificationManager notifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notifyManager.cancelAll();
-
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
 
-        btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
         btnSolicitarApoio = (Button) findViewById(R.id.btn_solicitar_apoio);
+        btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
         spnTipoAgente     = (Spinner) findViewById(R.id.spinner_agente);
         txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
         txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
@@ -65,10 +83,53 @@ public class AgenteMainActivity extends AppCompatActivity {
                 receberPedidos();
             }
         });
+        btnSolicitarApoio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                solicitaApoio(v);
+            }
+        });
 
         pedirPermissoes();
     }
 
+    public void solicitaApoio(View v){
+
+        spnTipoAgente.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                tipoAgente = spnTipoAgente.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        pedido = new PedidoAcompanhamento();
+        String idPedido = mRootRef.child("pedidos").push().getKey();
+
+        pedido.setId(idPedido);
+        pedido.setUsuario(usuarioLogado.getId());
+        buscaEndereco();
+        pedido.setData(Notificacao.retornaHora());
+        pedido.setTipo("Acompanhamento");
+        pedido.salvar();
+
+        dataNotification = new JSONObject();
+        try {
+            dataNotification.put("usuario",pedido.getUsuario());
+            dataNotification.put("id",pedido.getId());
+            dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
+            dataNotification.put("titulo", "Pedido de Acompannhamento");
+            dataNotification.put("localizacao", pedido.getLocalizacao());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        sendNotification("topics/"+tipoAgente,dataNotification);
+    }
 
     public void receberPedidos(){
         if (!clicou){
@@ -77,13 +138,13 @@ public class AgenteMainActivity extends AppCompatActivity {
                 usuarioLogado.setToken(token);
                 usuarioLogado.salvar();
             }
-            FirebaseMessaging.getInstance().subscribeToTopic("agentes");
+            FirebaseMessaging.getInstance().subscribeToTopic("GuardaMunicipal");
             btnReceberPedidos.setText("DESATIVAR PEDIDOS");
             txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
             clicou = true;
         }
         else {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("agentes");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("GuardaMunicipal");
             usuarioLogado.setToken("");
             usuarioLogado.salvar();
             btnReceberPedidos.setText("RECEBER PEDIDOS");
@@ -109,7 +170,7 @@ public class AgenteMainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("agentes");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("GuardaMunicipal");
             usuarioLogado.setToken("");
             usuarioLogado.salvar();
             mAuth.signOut();
@@ -190,6 +251,24 @@ public class AgenteMainActivity extends AppCompatActivity {
             usuarioLogado.salvar();
         }
     }
+    public void buscaEndereco(){
+        String rua = null;
+        String address = null;
+
+        List<Address> addresses;
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(),1);
+            rua = addresses.get(0).getThoroughfare();
+            address = addresses.get(0).getAddressLine(0);// rua numero e bairro
+            System.out.println("Endereço " + address);
+            pedido.setLocalizacao(address);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }
