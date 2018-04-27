@@ -30,6 +30,7 @@ public class Notificacao {
 
     public static final String SERVER_KEY = "AAAA7skqMcQ:APA91bFNM_stckhqzLOVd6xDTJ1jCvRHJ2oTPrl0W0GXTWswTx5uBNSRjTKyFUu9UKy0Hb6wZGcw1i7lA9CvQVvVNkqJ50QU6qMNOX0iXMu0P6Jf7cmOPteQwmHBqcxOv3eugJ8Nj_eh";
 
+    public static final String SENDER = "cSRp6zqNPn4:APA91bHz4HUPrFkLDqxH32oH58p8fSpKaGZntNvg5K5wFGTqK9VGD1QwQmSKm8P2dW4HgoG0Ndj1mME6LoDulaFQZVrGPTuSMkC8rj4lqBwE4BtP_20BbFUE4eYBfQG0jy_pq6Lsubod";
 
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");

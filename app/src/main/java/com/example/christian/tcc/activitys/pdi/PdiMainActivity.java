@@ -162,6 +162,7 @@ public class PdiMainActivity extends AppCompatActivity {
     }
 
     public void enviaPa()  {
+        String token = "";
 
         pedido = new PedidoAcompanhamento();
         String idPedido = mRootRef.child("pedidos").push().getKey();
@@ -173,6 +174,8 @@ public class PdiMainActivity extends AppCompatActivity {
         pedido.setTipo("Acompanhamento");
         pedido.salvar();
 
+        verificaPedido();
+
        dataNotification = new JSONObject();
         try {
             dataNotification.put("usuario",pedido.getUsuario());
@@ -180,32 +183,32 @@ public class PdiMainActivity extends AppCompatActivity {
             dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
             dataNotification.put("titulo", "Pedido de Acompannhamento");
             dataNotification.put("localizacao", pedido.getLocalizacao());
+            dataNotification.put("tipo", pedido.getTipo());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-//        Query query = mUserRef.orderByChild("tipoUsuario").equalTo("Agente").limitToFirst(1);
-//        query.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                if(dataSnapshot.getValue()!=null) {
-//                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
-//                    Usuario usuarioNotificado = child.getValue(Usuario.class);
-//                    sendNotification(usuarioNotificado.getToken(),dataNotification);
-//
-//                }
-//
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                //Se ocorrer um erro
-//            }
-//        });
+        Query query = mUserRef.orderByChild("tipoUsuario").equalTo("Agente").limitToFirst(2);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-        sendNotification("/topics/GuardaMunicipal",dataNotification);
-        verificaPedido();
+                if(dataSnapshot.getValue()!=null) {
+                    DataSnapshot child = dataSnapshot.getChildren().iterator().next();
+                    Usuario usuarioNotificado = child.getValue(Usuario.class);
+                    sendNotification("/topics/agente",dataNotification);
+
+                }
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Se ocorrer um erro
+            }
+        });
+
         criaDialog();
+
     }
 
     void verificaPedido(){

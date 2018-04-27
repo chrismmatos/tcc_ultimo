@@ -148,7 +148,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
 
                     tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() +") precisa de ajuda");
+                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");
                     tvDistancia.setText(df.format(distancia) + " metros");
 
                     tvEndereco.setText(pedidoAtual.getLocalizacao());
@@ -180,7 +180,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                     float distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
                     tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() +") precisa de ajuda");
+                            usuarioAcompanhado.getTipoPCD() + usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");
 
                     tvDistancia.setText(df.format(distancia) + " metros");
 
@@ -380,7 +380,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Localização da solicitação");
-        markerOptions.snippet(usuarioAcompanhado.getNome() + ": Deficiência: "+ usuarioAcompanhado.getTipoPCD());
+        markerOptions.snippet(usuarioAcompanhado.getNome() + " ("+ usuarioAcompanhado.getTipoPCD() + usuarioAcompanhado.getTipoAgente()+")");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         userLocationMaker = mMap.addMarker(markerOptions);
         //Move to new location

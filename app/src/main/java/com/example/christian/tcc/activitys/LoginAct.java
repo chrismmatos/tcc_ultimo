@@ -199,7 +199,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                         }
 
                         default: {
-                            FirebaseMessaging.getInstance().subscribeToTopic("agentes");
+                            FirebaseMessaging.getInstance().subscribeToTopic("agente");
                             startActivity(new Intent(LoginAct.this, AgenteMainActivity.class));
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
                             showProgress(false);

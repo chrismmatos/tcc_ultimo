@@ -41,6 +41,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             pedidoAtual = new PedidoAcompanhamento();
             pedidoAtual.setId( dataMap.get("id").toString() );
             pedidoAtual.setUsuario( dataMap.get("usuario").toString() );
+            pedidoAtual.setTipo(dataMap.get("tipo").toString() );
 
             if(isActivityVisible()) {
                 startActivity(new Intent(this, DialogActivity.class));
@@ -86,7 +87,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.ic_accessible);
+
+        switch (pedidoAtual.getTipo()){
+            case "Reforço" : {
+                builder.setSmallIcon(R.drawable.ic_siren);
+                break;
+            }
+            default:
+                builder.setSmallIcon(R.drawable.ic_accessible);
+        }
+
         builder.setContentTitle(dataMap.get("titulo"));
         builder.setContentText(dataMap.get("descricao"));
         builder.addAction(aceitarAc);

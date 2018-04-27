@@ -31,7 +31,13 @@ import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
 import com.example.christian.tcc.config.MyFirebaseMessagingService;
 import com.example.christian.tcc.helper.Notificacao;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
+import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -61,6 +67,8 @@ public class AgenteMainActivity extends AppCompatActivity {
     private boolean clicou = true;
     private String tipoAgente ="";
     private PedidoAcompanhamento pedido;
+    private DatabaseReference refUsers;
+    private Usuario usuario;
 
 
     @Override
@@ -71,6 +79,7 @@ public class AgenteMainActivity extends AppCompatActivity {
         NotificationManager notifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notifyManager.cancelAll();
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
+        refUsers = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
         btnSolicitarApoio = (Button) findViewById(R.id.btn_solicitar_apoio);
         btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
@@ -114,21 +123,48 @@ public class AgenteMainActivity extends AppCompatActivity {
         pedido.setUsuario(usuarioLogado.getId());
         buscaEndereco();
         pedido.setData(Notificacao.retornaHora());
-        pedido.setTipo("Acompanhamento");
+        pedido.setTipo("Reforço");
         pedido.salvar();
 
         dataNotification = new JSONObject();
         try {
             dataNotification.put("usuario",pedido.getUsuario());
             dataNotification.put("id",pedido.getId());
-            dataNotification.put("descricao", usuarioLogado.getNome() + " está solicitando um acompanhamento!");
-            dataNotification.put("titulo", "Pedido de Acompannhamento");
+            dataNotification.put("descricao", usuarioLogado.getTipoAgente()+ " "+usuarioLogado.getNome() + " está solicitando reforço!");
+            dataNotification.put("titulo", "Pedido de Reforço");
             dataNotification.put("localizacao", pedido.getLocalizacao());
+            dataNotification.put("tipo", pedido.getTipo());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        sendNotification("topics/"+tipoAgente,dataNotification);
+        localizaAgentes();
+
+    }
+
+    public void localizaAgentes(){
+        Query userQuery = refUsers.orderByChild("tipoAgente").equalTo(tipoAgente);
+
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot usuarioSnapshot : dataSnapshot.getChildren()){
+                    usuario = usuarioSnapshot.getValue(Usuario.class);
+                    if(!usuarioLogado.getId().equals(usuario.getId()))
+                        Notificacao.sendNotification(usuario.getToken(), dataNotification);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        System.out.println("teste");
     }
 
     public void receberPedidos(){
@@ -138,13 +174,13 @@ public class AgenteMainActivity extends AppCompatActivity {
                 usuarioLogado.setToken(token);
                 usuarioLogado.salvar();
             }
-            FirebaseMessaging.getInstance().subscribeToTopic("GuardaMunicipal");
+            FirebaseMessaging.getInstance().subscribeToTopic("agente");
             btnReceberPedidos.setText("DESATIVAR PEDIDOS");
             txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
             clicou = true;
         }
         else {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("GuardaMunicipal");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
             usuarioLogado.setToken("");
             usuarioLogado.salvar();
             btnReceberPedidos.setText("RECEBER PEDIDOS");
@@ -170,7 +206,7 @@ public class AgenteMainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
-            FirebaseMessaging.getInstance().unsubscribeFromTopic("GuardaMunicipal");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
             usuarioLogado.setToken("");
             usuarioLogado.salvar();
             mAuth.signOut();

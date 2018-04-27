@@ -15,6 +15,7 @@ import com.example.christian.tcc.helper.Notificacao;
 
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.dataMap;
+import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
 public class DialogActivity extends AppCompatActivity {
     private AlertDialog.Builder dialog;
@@ -33,7 +34,15 @@ public class DialogActivity extends AppCompatActivity {
         //configurar mensagem
         dialog.setMessage(dataMap.get("descricao"));
         dialog.setCancelable(false);
-        dialog.setIcon(R.drawable.ic_accessible);
+
+        switch (pedidoAtual.getTipo()){
+            case "Reforço" : {
+                dialog.setIcon(R.drawable.ic_siren);
+                break;
+            }
+            default:
+                dialog.setIcon(R.drawable.ic_accessible);
+        }
 
         dialog.setNegativeButton("Recusar",
                 new DialogInterface.OnClickListener() {
