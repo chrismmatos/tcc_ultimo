@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -75,6 +76,11 @@ public class AgenteMainActivity extends AppCompatActivity {
     private Button btnSolicitarApoio;
     private Spinner spnTipoAgente;
     private TextView txtReceberPedidos;
+    private TextView txtMapearAgentes;
+    private TextView txtNome;
+    private TextView txtTipoAgente;
+    private ImageView imgAvatar;
+    private TextView txtApoio;
     private FirebaseAuth mAuth;
     private boolean clicou = true;
     private String tipoAgente ="";
@@ -97,11 +103,19 @@ public class AgenteMainActivity extends AppCompatActivity {
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
         refUsers = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
+
         btnSolicitarApoio = (Button) findViewById(R.id.btn_solicitar_apoio);
         btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
         spnTipoAgente     = (Spinner) findViewById(R.id.spinner_agente);
         txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
-        txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
+        txtMapearAgentes = (TextView) findViewById(R.id.txt_mapear);
+        txtNome = (TextView) findViewById(R.id.txt_nome);
+        txtTipoAgente = (TextView) findViewById(R.id.txt_agente);
+        txtApoio = (TextView) findViewById(R.id.txt_apoio);
+        imgAvatar = (ImageView) findViewById(R.id.img_avatar);
+        txtApoio.setText("Selecione uma categoria de agentes para solicitar um apoio.");
+        txtMapearAgentes.setText("Encontre agentes próximos.");
+        txtReceberPedidos.setText("Disponível para receber pedidos.");
         btnReceberPedidos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,7 +128,6 @@ public class AgenteMainActivity extends AppCompatActivity {
                 solicitaApoio(v);
             }
         });
-
         spnTipoAgente.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -127,7 +140,30 @@ public class AgenteMainActivity extends AppCompatActivity {
             }
         });
 
+        carregaDados();
         pedirPermissoes();
+    }
+
+    private void carregaDados(){
+        switch (usuarioLogado.getTipoAgente()){
+            case "Guarda Municipal":
+                imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_guarda));
+                break;
+            case "Agente de Defesa Civil":
+                imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_defesa_civil));
+                break;
+            case "Policial Militar":
+                imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_polical));
+                break;
+            case "Bombeiro":
+                imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_bombeiro));
+                break;
+
+                default:
+                    imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_saude));
+        }
+        txtTipoAgente.setText(usuarioLogado.getTipoAgente());
+        txtNome.setText(usuarioLogado.getNome());
     }
 
     public void criaDialog(){
@@ -254,7 +290,8 @@ public class AgenteMainActivity extends AppCompatActivity {
             }
             FirebaseMessaging.getInstance().subscribeToTopic("agente");
             btnReceberPedidos.setText("DESATIVAR PEDIDOS");
-            txtReceberPedidos.setText("Você poderá receber um pedido de acompanhamento a qualquer momento.");
+            txtReceberPedidos.setText("Disponível para receber pedidos.");
+            btnReceberPedidos.setBackground(getResources().getDrawable(R.drawable.selector_button_concluir));
             clicou = true;
         }
         else {
@@ -263,8 +300,8 @@ public class AgenteMainActivity extends AppCompatActivity {
             usuarioLogado.salvar();
             btnReceberPedidos.setText("RECEBER PEDIDOS");
             txtReceberPedidos.setText("Você não está disponível para receber pedidos.");
+            btnReceberPedidos.setBackground(getResources().getDrawable(R.drawable.selector_button_cancelar));
             clicou = false;
-
         }
     }
 
@@ -292,7 +329,6 @@ public class AgenteMainActivity extends AppCompatActivity {
             finish();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
