@@ -131,7 +131,7 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
                         startActivity(new Intent(PdiAcompActivity.this, PdiMainActivity.class));
                         finish();
                         Toast.makeText(getApplicationContext(),
-                                "O acompanhamento foi cancelado! Você pode realizar um novo pedido.", Toast.LENGTH_LONG).show();
+                                "O "+ pedidoAtual.getTipo() + " foi cancelado! Você pode realizar um novo pedido.", Toast.LENGTH_LONG).show();
                         pedidoRef.removeEventListener(pedidoListener);
                         pedidoRef.removeValue();
                     }
@@ -143,7 +143,6 @@ public class PdiAcompActivity extends FragmentActivity implements OnMapReadyCall
 
             }
         });
-
     }
 
     private void getMarkers(){

@@ -125,17 +125,14 @@ public class PdiMainActivity extends AppCompatActivity {
     }
 
     public void expiraPedido(){
-
         android.app.AlertDialog.Builder dialog;
 
         //configurar dialog
         dialog = new android.app.AlertDialog.Builder(this);
         dialog.setTitle("Tempo limite atingido!");
-
         //configurar mensagem
         dialog.setMessage("O tempo de limite de espera foi atingido. Você pode realizar o pedido novamente agora ou mais tarde");
         dialog.setCancelable(false);
-
         dialog.setNeutralButton("OK",null);
 
         android.app.AlertDialog alert = dialog.create();
@@ -149,7 +146,6 @@ public class PdiMainActivity extends AppCompatActivity {
         btnNeutral.setBackground(getResources().getDrawable(R.drawable.selector_button));
         btnNeutral.setTextColor(Color.WHITE);
         btnNeutral.setLayoutParams(layoutParams);
-
     }
 
     public  void cancelaPedido(){
@@ -208,7 +204,6 @@ public class PdiMainActivity extends AppCompatActivity {
         });
 
         criaDialog();
-
     }
 
     void verificaPedido(){

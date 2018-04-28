@@ -5,26 +5,34 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.CountDownTimer;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.LoginAct;
+import com.example.christian.tcc.activitys.pdi.PdiAcompActivity;
+import com.example.christian.tcc.activitys.pdi.PdiMainActivity;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
@@ -46,6 +54,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,6 +68,9 @@ public class AgenteMainActivity extends AppCompatActivity {
     OkHttpClient mClient = new OkHttpClient();
     JSONObject dataNotification;
 
+    //tempo de espera em minutos
+    private final int TEMPO_ESPERA = 2;
+
     private Button btnReceberPedidos;
     private Button btnSolicitarApoio;
     private Spinner spnTipoAgente;
@@ -68,7 +80,11 @@ public class AgenteMainActivity extends AppCompatActivity {
     private String tipoAgente ="";
     private PedidoAcompanhamento pedido;
     private DatabaseReference refUsers;
+    private ValueEventListener pedidoListener;
+    private  DatabaseReference refPedido;
     private Usuario usuario;
+    static public AlertDialog alerta;
+    private MyCountDownTimer timer;
 
 
     @Override
@@ -99,11 +115,6 @@ public class AgenteMainActivity extends AppCompatActivity {
             }
         });
 
-        pedirPermissoes();
-    }
-
-    public void solicitaApoio(View v){
-
         spnTipoAgente.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -116,6 +127,35 @@ public class AgenteMainActivity extends AppCompatActivity {
             }
         });
 
+        pedirPermissoes();
+    }
+
+    public void criaDialog(){
+        //LayoutInflater é utilizado para inflar nosso layout em uma view.
+        //-pegamos nossa instancia da classe
+        LayoutInflater li = getLayoutInflater();
+
+        //inflamos o layout alerta.xml na view
+        View view = li.inflate(R.layout.dialog_layout, null);
+        TextView textView = view.findViewById(R.id.tv_timer);
+        timer = new MyCountDownTimer(this, textView,  TEMPO_ESPERA *60*1000, 1000);
+        timer.start();
+        //definimos para o botão do layout um clickListener
+        view.findViewById(R.id.btn_cancelar).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+                cancelaPedido();
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pedido enviado!");
+        builder.setView(view);
+        builder.setCancelable(false);
+        alerta = builder.create();
+        alerta.show();
+    }
+
+    public void solicitaApoio(View v){
         pedido = new PedidoAcompanhamento();
         String idPedido = mRootRef.child("pedidos").push().getKey();
 
@@ -125,6 +165,7 @@ public class AgenteMainActivity extends AppCompatActivity {
         pedido.setData(Notificacao.retornaHora());
         pedido.setTipo("Reforço");
         pedido.salvar();
+        verificaPedido();
 
         dataNotification = new JSONObject();
         try {
@@ -139,7 +180,46 @@ public class AgenteMainActivity extends AppCompatActivity {
         }
 
         localizaAgentes();
+        criaDialog();
+    }
 
+    void verificaPedido(){
+        refPedido= mRootRef.child("pedidos").child(pedido.getId());
+
+        pedidoListener = refPedido.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                pedido = dataSnapshot.getValue(PedidoAcompanhamento.class);
+
+                if(pedido.isAtivo()) {
+                    refPedido.removeEventListener(pedidoListener);
+                    alerta.dismiss();
+                    timer.cancel();
+                    final Intent i = new Intent(AgenteMainActivity.this, AgenteAcompActivity.class);
+                    i.putExtra("pedido",pedido);
+                    i.putExtra("usuario", usuarioLogado);
+
+                    refPedido = mRootRef.child("usuarios").child(pedido.getAcompanhante());
+
+                    refPedido.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Usuario acompanhante = dataSnapshot.getValue(Usuario.class);
+                            i.putExtra("acompanhante",acompanhante);
+                            startActivity(i);
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void localizaAgentes(){
@@ -155,9 +235,7 @@ public class AgenteMainActivity extends AppCompatActivity {
                         Notificacao.sendNotification(usuario.getToken(), dataNotification);
 
                 }
-
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -287,14 +365,14 @@ public class AgenteMainActivity extends AppCompatActivity {
             usuarioLogado.salvar();
         }
     }
-    public void buscaEndereco(){
+    public void buscaEndereco() {
         String rua = null;
         String address = null;
 
         List<Address> addresses;
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         try {
-            addresses = geocoder.getFromLocation(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(),1);
+            addresses = geocoder.getFromLocation(usuarioLogado.getLatitude(), usuarioLogado.getLongitude(), 1);
             rua = addresses.get(0).getThoroughfare();
             address = addresses.get(0).getAddressLine(0);// rua numero e bairro
             System.out.println("Endereço " + address);
@@ -305,6 +383,79 @@ public class AgenteMainActivity extends AppCompatActivity {
         }
     }
 
+
+    public void expiraPedido(){
+        android.app.AlertDialog.Builder dialog;
+
+        //configurar dialog
+        dialog = new android.app.AlertDialog.Builder(this);
+        dialog.setTitle("Tempo limite atingido!");
+        //configurar mensagem
+        dialog.setMessage("O tempo de limite de espera foi atingido. Você pode realizar o pedido novamente agora ou mais tarde");
+        dialog.setCancelable(false);
+        dialog.setNeutralButton("OK",null);
+
+        android.app.AlertDialog alert = dialog.create();
+        alert.show();
+
+        Button btnNeutral = alert.getButton(android.app.AlertDialog.BUTTON_NEUTRAL);
+
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) btnNeutral.getLayoutParams();
+        layoutParams.gravity = Gravity.CENTER;
+        layoutParams.weight = 40;
+        btnNeutral.setBackground(getResources().getDrawable(R.drawable.selector_button));
+        btnNeutral.setTextColor(Color.WHITE);
+        btnNeutral.setLayoutParams(layoutParams);
+    }
+
+    // Classe Contadora
+    public class MyCountDownTimer extends CountDownTimer {
+
+        private TextView tv;
+        private Context context;
+        private long timerInTure;
+
+        public MyCountDownTimer(Context context, TextView tv, long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+            this.context = context;
+            this.tv = tv;
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            timerInTure = millisUntilFinished;
+            tv.setText("Procurando agentes próximos...\n"
+                    + getCorrectTimer(true, millisUntilFinished) + ":" + getCorrectTimer(false, millisUntilFinished));
+        }
+
+        @Override
+        public void onFinish() {
+            timerInTure -= 1000;
+            tv.setText("Procurando agentes próximos...\n"
+                    + getCorrectTimer(true, timerInTure) + ":" + getCorrectTimer(false, timerInTure));
+            alerta.dismiss();
+            cancelaPedido();
+            expiraPedido();
+        }
+
+        private String getCorrectTimer(boolean isMinute, long millisUntilFinished) {
+            String aux;
+            int constCalendar = isMinute ? Calendar.MINUTE : Calendar.SECOND;
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(millisUntilFinished);
+            aux = c.get(constCalendar) < 10 ? "0" + c.get(constCalendar) : "" + c.get(constCalendar);
+            return (aux);
+        }
+    }
+
+    public void cancelaPedido () {
+        pedido.setAtivo(true);
+        pedido.salvar();
+        refPedido.removeEventListener(pedidoListener);
+        refPedido.removeValue();
+        alerta.dismiss();
+        timer.cancel();
+    }
 
 
 }

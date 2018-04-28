@@ -58,6 +58,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     private Marker currentLocationMaker;
     private Marker userLocationMaker;
     private LatLng currentLocationLatLong;
+    private String descricao;
 
     private DatabaseReference refUser;
     private DatabaseReference refPedido;
@@ -65,12 +66,23 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     private Usuario usuarioAcompanhado;
     private Usuario usuarioLogado;
 
+    private boolean SOLICITACAO_APOIO;
+
     AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agent_acomp);
+
+        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
+        String caminho;
+        if (getIntent().getSerializableExtra("pedido")!=null) {
+            pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
+            caminho = "usuarios/"+pedidoAtual.getAcompanhante();
+            SOLICITACAO_APOIO = true;
+        } else  { caminho = "usuarios/"+pedidoAtual.getUsuario();}
+        refUser = refUser.child(caminho);
 
         tvData = (TextView) findViewById(R.id.tv_data);
         tvDescricao = (TextView) findViewById(R.id.tv_descricao);
@@ -117,7 +129,6 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                             Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -132,9 +143,6 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     }
 
     public void carregaUsuario(){
-        refUser = ConfiguracaoFirebase.getFirebaseDatabase();
-        String caminho = "usuarios/"+pedidoAtual.getUsuario();
-        refUser = refUser.child(caminho);
         refUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -147,8 +155,14 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                     double distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
 
+                    if(SOLICITACAO_APOIO){
+                        tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
+                                usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") está em deslocamento.");
+                    }
+                    else{
                     tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");
+                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");}
+
                     tvDistancia.setText(df.format(distancia) + " metros");
 
                     tvEndereco.setText(pedidoAtual.getLocalizacao());
@@ -179,11 +193,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                     DecimalFormat df = new DecimalFormat("###,##0.00");
                     float distancia = (float) distanceBetween(usuarioLogado.getLatitude(),usuarioLogado.getLongitude(),
                             usuarioAcompanhado.getLatitude(),usuarioAcompanhado.getLongitude());
-                    tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() + usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");
-
                     tvDistancia.setText(df.format(distancia) + " metros");
-
                     usuarioLogado.salvar();
                 }
             }
@@ -197,7 +207,12 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     void criaDialog(){
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pedido aceito");
-        builder.setMessage("Dirija-se até "+ usuarioAcompanhado.getNome()+ " para iniciar o acompanhamento");
+
+        if(SOLICITACAO_APOIO){
+            builder.setMessage(usuarioAcompanhado.getNome()+ " está indo até você para ajudá-lo" );
+        }
+        else
+            { builder.setMessage("Dirija-se até "+ usuarioAcompanhado.getNome()+ " para iniciar o " + pedidoAtual.getTipo());}
         builder.setCancelable(false);
         builder.setNeutralButton("Ok",null);
         AlertDialog alert = builder.create();
