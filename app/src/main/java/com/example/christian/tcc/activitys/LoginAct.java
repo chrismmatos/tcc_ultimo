@@ -179,6 +179,7 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
                     DataSnapshot child = dataSnapshot.getChildren().iterator().next();
                     usuarioLogado = child.getValue(Usuario.class);
                     usuarioLogado.setToken(FirebaseInstanceId.getInstance().getToken());
+                    usuarioLogado.setOnline(true);
                     usuarioLogado.salvar();
 
                     switch (usuarioLogado.getTipoUsuario()) {

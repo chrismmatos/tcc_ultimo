@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,13 +75,16 @@ public class AgenteMainActivity extends AppCompatActivity {
 
     private Button btnReceberPedidos;
     private Button btnSolicitarApoio;
+    private Button btnMapearAgente;
     private Spinner spnTipoAgente;
     private TextView txtReceberPedidos;
     private TextView txtMapearAgentes;
     private TextView txtNome;
     private TextView txtTipoAgente;
-    private ImageView imgAvatar;
     private TextView txtApoio;
+    private TextView txtLevel;
+    private ProgressBar progressBar;
+    private ImageView imgAvatar;
     private FirebaseAuth mAuth;
     private boolean clicou = true;
     private String tipoAgente ="";
@@ -103,15 +107,17 @@ public class AgenteMainActivity extends AppCompatActivity {
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
         refUsers = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
-
         btnSolicitarApoio = (Button) findViewById(R.id.btn_solicitar_apoio);
         btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
+        btnMapearAgente = (Button) findViewById(R.id.btn_mapear_agentes);
         spnTipoAgente     = (Spinner) findViewById(R.id.spinner_agente);
         txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
         txtMapearAgentes = (TextView) findViewById(R.id.txt_mapear);
         txtNome = (TextView) findViewById(R.id.txt_nome);
         txtTipoAgente = (TextView) findViewById(R.id.txt_agente);
         txtApoio = (TextView) findViewById(R.id.txt_apoio);
+        txtLevel = (TextView) findViewById(R.id.txt_level);
+        progressBar = (ProgressBar) findViewById(R.id.progress_level);
         imgAvatar = (ImageView) findViewById(R.id.img_avatar);
         txtApoio.setText("Selecione uma categoria de agentes para solicitar um apoio.");
         txtMapearAgentes.setText("Encontre agentes próximos.");
@@ -126,6 +132,12 @@ public class AgenteMainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 solicitaApoio(v);
+            }
+        });
+        btnMapearAgente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapeiaAgentes(v);
             }
         });
         spnTipoAgente.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
@@ -164,6 +176,14 @@ public class AgenteMainActivity extends AppCompatActivity {
         }
         txtTipoAgente.setText(usuarioLogado.getTipoAgente());
         txtNome.setText(usuarioLogado.getNome());
+        txtLevel.setText("Level "+ usuarioLogado.getLevel());
+        progressBar.setProgress(usuarioLogado.getProgress());
+    }
+
+    public void mapeiaAgentes(View v ){
+        Intent i = new Intent(AgenteMainActivity.this, AgenteMapsActivity.class);
+        i.putExtra("usuario", usuarioLogado);
+        startActivity(i);
     }
 
     public void criaDialog(){
@@ -286,6 +306,7 @@ public class AgenteMainActivity extends AppCompatActivity {
             String token  = FirebaseInstanceId.getInstance().getToken();
             if(usuarioLogado!=null) {
                 usuarioLogado.setToken(token);
+                usuarioLogado.setOnline(true);
                 usuarioLogado.salvar();
             }
             FirebaseMessaging.getInstance().subscribeToTopic("agente");
@@ -297,6 +318,7 @@ public class AgenteMainActivity extends AppCompatActivity {
         else {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
             usuarioLogado.setToken("");
+            usuarioLogado.setOnline(false);
             usuarioLogado.salvar();
             btnReceberPedidos.setText("RECEBER PEDIDOS");
             txtReceberPedidos.setText("Você não está disponível para receber pedidos.");
@@ -323,6 +345,7 @@ public class AgenteMainActivity extends AppCompatActivity {
         if (id == R.id.action_exit) {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
             usuarioLogado.setToken("");
+            usuarioLogado.setOnline(false);
             usuarioLogado.salvar();
             mAuth.signOut();
             startActivity(new Intent(this, LoginAct.class));

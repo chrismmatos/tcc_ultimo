@@ -161,7 +161,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                     }
                     else{
                     tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") precisa de ajuda");}
+                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") está sem mobilidade e precisa de ajuda!");}
 
                     tvDistancia.setText(df.format(distancia) + " metros");
 
@@ -353,7 +353,6 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                 }
             }
         }
-
 
         //Checks if FINE LOCATION and COARSE Location were granted
         if (ActivityCompat.checkSelfPermission(this,

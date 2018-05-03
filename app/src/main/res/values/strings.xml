@@ -18,4 +18,5 @@
     <string name="title_activity_meu_local">Meu Local</string>
     <string name="title_activity_maps">Meu Local</string>
     <string name="title_activity_acomp_pdi">Map</string>
+    <string name="title_activity_agente_maps">Map</string>
 </resources>

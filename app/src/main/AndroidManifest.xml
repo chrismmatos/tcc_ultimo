@@ -90,7 +90,10 @@
         <activity android:name=".activitys.agente.NotificationTransitionActivity" />
         <activity
             android:name=".activitys.pdi.PdiAcompActivity"
-            android:label="@string/title_activity_acomp_pdi"></activity>
+            android:label="@string/title_activity_acomp_pdi" />
+        <activity
+            android:name=".activitys.agente.AgenteMapsActivity"
+            android:label="@string/title_activity_agente_maps"></activity>
     </application>
 
 </manifest>

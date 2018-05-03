@@ -11,7 +11,7 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -22,8 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.046">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
 
         <Spinner
             android:id="@+id/spinner_agente"
@@ -44,7 +43,6 @@
             style="@android:style/Widget.Material.Light.Button.Toggle"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -52,7 +50,6 @@
             android:elevation="0dp"
             android:text="SOLICITAR APOIO"
             android:textColor="@color/colorTextSecundary"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -140,20 +137,20 @@
 
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout3"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:background="#EEEEEE"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="1.0">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
         <TextView
             android:id="@+id/txt_nome"
@@ -163,10 +160,10 @@
             android:layout_alignParentTop="true"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_weight="1"
             android:text="Christian Moreira"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/img_avatar"
@@ -176,46 +173,33 @@
             android:id="@+id/txt_agente"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/txt_nivel"
+            android:layout_above="@+id/txt_level"
             android:layout_centerHorizontal="true"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="Guarda Municipal"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/img_avatar"
+            app:layout_constraintStart_toStartOf="@+id/img_avatar"
             app:layout_constraintTop_toBottomOf="@+id/img_avatar" />
 
-        <RatingBar
-            android:id="@+id/rating_nivel"
-            style="@style/Widget.AppCompat.RatingBar.Indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:numStars="5"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.52"
-            app:layout_constraintStart_toEndOf="@+id/img_avatar"
-            app:layout_constraintTop_toBottomOf="@+id/txt_nome" />
-
         <TextView
-            android:id="@+id/txt_nivel"
+            android:id="@+id/txt_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="Amador"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/img_avatar"
-            app:layout_constraintTop_toBottomOf="@+id/rating_nivel" />
+            android:text="Level 1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+            app:layout_constraintEnd_toEndOf="@+id/progress_level"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toStartOf="@+id/progress_level"
+            app:layout_constraintTop_toBottomOf="@+id/progress_level" />
 
         <ImageView
             android:id="@+id/img_avatar"
@@ -229,6 +213,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_bombeiro" />
+
+        <ProgressBar
+            android:id="@+id/progress_level"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="150dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:progress="10"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/img_avatar"
+            app:layout_constraintTop_toBottomOf="@+id/txt_nome" />
+
+
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

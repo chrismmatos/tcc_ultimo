@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class Usuario implements Serializable {
     private String id = "";
-    private Integer idLogado = 0;
     private String tipoUsuario = "";
     private String tipoAgente = "";
     private String tipoPCD = "";
@@ -26,8 +25,17 @@ public class Usuario implements Serializable {
     private Double latitude = 0.0;
     private Double longitude = 0.0;
     private String token = "";
+    private boolean online = false;
 
     public Usuario(){ }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 
     public String getToken() {
         return token;
@@ -59,14 +67,6 @@ public class Usuario implements Serializable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Integer getIdLogado() {
-        return idLogado;
-    }
-
-    public void setIdLogado(Integer idLogado) {
-        this.idLogado = idLogado;
     }
 
     public String getTipoUsuario() {
@@ -120,7 +120,6 @@ public class Usuario implements Serializable {
     public Map <String, Object> toMap(){
         HashMap<String,Object> result = new HashMap<>();
         result.put("id",id);
-        result.put("idLogado",idLogado);
         result.put("tipoUsuario",tipoUsuario);
         result.put("nome",nome);
         result.put("email",email);
@@ -140,6 +139,14 @@ public class Usuario implements Serializable {
 
     public void addAcomp(){
         acompanhamentosRealizados ++;
+    }
+
+    public int getLevel(){
+        return (acompanhamentosRealizados/5) + 1;
+    }
+
+    public int getProgress(){
+        return (acompanhamentosRealizados % 5) * 25;
     }
 
 }
