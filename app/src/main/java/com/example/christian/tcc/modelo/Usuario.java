@@ -24,10 +24,19 @@ public class Usuario implements Serializable {
     private Integer acompanhamentosRealizados = 0;
     private Double latitude = 0.0;
     private Double longitude = 0.0;
-    private String token = "";
+    private String token = null;
     private boolean online = false;
+    public String vtr = null;
 
     public Usuario(){ }
+
+    public String getVtr() {
+        return vtr;
+    }
+
+    public void setVtr(String vtr) {
+        this.vtr = vtr;
+    }
 
     public boolean isOnline() {
         return online;

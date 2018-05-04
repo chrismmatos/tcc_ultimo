@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.LoginAct;
+import com.example.christian.tcc.activitys.PreferenciasActivity;
 import com.example.christian.tcc.activitys.pdi.PdiAcompActivity;
 import com.example.christian.tcc.activitys.pdi.PdiMainActivity;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
@@ -40,6 +41,7 @@ import com.example.christian.tcc.config.ConfiguracaoFirebase;
 import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
 import com.example.christian.tcc.config.MyFirebaseMessagingService;
 import com.example.christian.tcc.helper.Notificacao;
+import com.example.christian.tcc.helper.Preferencias;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
@@ -352,6 +354,12 @@ public class AgenteMainActivity extends AppCompatActivity {
             finish();
             return true;
         }
+
+        else if(id == R.id.action_preferencias){
+            Intent i = new Intent(this, PreferenciasActivity.class);
+            startActivity(i);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

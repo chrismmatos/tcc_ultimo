@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -104,7 +106,7 @@ public class AgenteMapsActivity extends FragmentActivity implements OnMapReadyCa
                                     color = BitmapDescriptorFactory.HUE_CYAN;
                             }
 
-                            addMarker(latLng, usuario.getTipoAgente(), usuario.getNome(), color);
+                            addMarker(usuario, latLng, color);
                         }
 
                     }
@@ -255,14 +257,41 @@ public class AgenteMapsActivity extends FragmentActivity implements OnMapReadyCa
         }
     }
 
-    private void addMarker (LatLng latLng, String tipoAgente, String nome , float color) {
+    private void addMarker (Usuario usuario, LatLng latLng, float color) {
+        Bitmap bipmap;
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title(nome);
-        markerOptions.snippet(tipoAgente);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
+        markerOptions.title(usuario.getNome());
+        markerOptions.snippet(usuario.getTipoAgente());
+
+        if(usuario.getVtr()!= null){
+            switch (usuario.getVtr()){
+                case "Van":
+                    bipmap = BitmapFactory.decodeResource(getResources(),
+                            R.drawable.ic_van);
+                    break;
+
+                case "Moto":
+                    bipmap = BitmapFactory.decodeResource(getResources(),
+                            R.drawable.ic_moto);
+                    break;
+
+                case "Ambulância":
+                    bipmap = BitmapFactory.decodeResource(getResources(),
+                            R.drawable.ic_ambulancia);
+                    break;
+
+                default:
+                    bipmap = BitmapFactory.decodeResource(getResources(),
+                            R.drawable.ic_car);
+                    break;
+            }
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bipmap));
+        }
+        else
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(color));
+
         userLocationMaker = mMap.addMarker(markerOptions);
-        //Move to new location
     }
 
     @Override
