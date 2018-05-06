@@ -66,6 +66,7 @@ public class PdiMainActivity extends AppCompatActivity {
     public static final String ADRESS ="https://fcm.googleapis.com/fcm/send";
     private FirebaseAuth mAuth;
     private Button btnPa;
+    private Button btnPae;
 
     OkHttpClient mClient = new OkHttpClient();
     JSONObject dataNotification;
@@ -77,6 +78,7 @@ public class PdiMainActivity extends AppCompatActivity {
     private  DatabaseReference refPedido;
     private String SENDER_ID = "cU1VUF5EAms:APA91bFH7WQ7dYJGmmM16aRjCUmBMPzA28OT9R8VTI5Z2O6sekFXOR9CuHli0C-qZkEpPm-vWgJYGayDuuzdxAUh4pkZ1hVu9na2CV2dTheL81FyBWm6uzyq0gQujwIPdkJBgSI8r9R7";
     private MyCountDownTimer timer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,14 @@ public class PdiMainActivity extends AppCompatActivity {
                 enviaPa();
             }
         });
+        btnPae = (Button)findViewById(R.id.btn_solicitarPAE);
+        btnPae.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviaPa();
+            }
+        });
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

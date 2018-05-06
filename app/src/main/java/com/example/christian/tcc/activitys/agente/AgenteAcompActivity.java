@@ -44,6 +44,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 
+import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
 import static com.example.christian.tcc.config.MyFirebaseMessagingService.pedidoAtual;
 
 public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
@@ -64,7 +65,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     private DatabaseReference refPedido;
     private ValueEventListener eventListener;
     private Usuario usuarioAcompanhado;
-    private Usuario usuarioLogado;
+
 
     private boolean SOLICITACAO_APOIO;
 
@@ -95,7 +96,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                 cancelaPedido(v);
             }
         });
-        usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
+        //usuarioLogado = (Usuario) getIntent().getSerializableExtra("usuario");
 
         carregaUsuario();
 
@@ -137,9 +138,12 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void cancelaPedido(View view){
+        refPedido.removeEventListener(eventListener);
         pedidoAtual.setAtivo(false);
         pedidoAtual.salvar();
         finish();
+        Toast.makeText(AgenteAcompActivity.this, "Pedido cancelado!",
+                Toast.LENGTH_SHORT).show();
     }
 
     public void carregaUsuario(){

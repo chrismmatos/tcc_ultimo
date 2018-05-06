@@ -367,6 +367,8 @@ public class AgenteMainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         ChecaSegundoPlano.activityResumed();
+        txtLevel.setText("Level "+ usuarioLogado.getLevel());
+        progressBar.setProgress(usuarioLogado.getProgress());
     }
 
     @Override

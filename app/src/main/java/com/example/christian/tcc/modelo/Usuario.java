@@ -147,7 +147,7 @@ public class Usuario implements Serializable {
     }
 
     public void addAcomp(){
-        acompanhamentosRealizados ++;
+        acompanhamentosRealizados +=1;
     }
 
     public int getLevel(){
@@ -155,7 +155,7 @@ public class Usuario implements Serializable {
     }
 
     public int getProgress(){
-        return (acompanhamentosRealizados % 5) * 25;
+        return (acompanhamentosRealizados % 5) * 20;
     }
 
 }
