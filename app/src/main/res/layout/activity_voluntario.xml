@@ -4,18 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activitys.agente.AgenteMainActivity"
-    tools:layout_editor_absoluteY="81dp">
+    tools:context=".VoluntarioActivity">
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:background="#EEEEEE"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,65 +22,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
 
-        <Spinner
-            android:id="@+id/spinner_agente"
-            style="@style/Widget.AppCompat.Spinner.Underlined"
-            android:layout_width="0dp"
-            android:layout_height="39dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:entries="@array/tipoAgente"
-            android:textColor="@color/colorTextPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_apoio" />
-
-        <Button
-            android:id="@+id/btn_solicitar_apoio"
-            style="@android:style/Widget.Material.Light.Button.Toggle"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/selector_button"
-            android:elevation="0dp"
-            android:text="SOLICITAR APOIO"
-            android:textColor="@color/colorTextSecundary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner_agente" />
-
         <TextView
             android:id="@+id/txt_receber_pedidos_voluntario"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="17dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="32dp"
             android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView"
             android:textColor="@color/colorTextPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Você não está disponível para receber pedidos." />
-
-        <TextView
-            android:id="@+id/txt_mapear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView"
-            android:textColor="@color/colorTextPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_receber_pedidos_voluntario"
-            tools:text="Encontre agentes próximos a você." />
 
         <Button
             android:id="@+id/btn_receber_pedidos_voluntario"
@@ -100,38 +52,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_receber_pedidos_voluntario" />
 
-        <TextView
-            android:id="@+id/txt_apoio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:textAppearance="@android:style/TextAppearance.Material.Widget.TextView"
-            android:textColor="@color/colorTextPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_mapear_agentes"
-            tools:text="Selecione uma categoria de agentes para solicitar um apoio." />
-
-
-        <Button
-            android:id="@+id/btn_mapear_agentes"
-            style="@android:style/Widget.Material.Light.Button.Toggle"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/selector_button"
-            android:elevation="0dp"
-            android:text="MAPEAR AGENTES"
-            android:textColor="@color/colorTextSecundary"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_mapear" />
 
     </android.support.constraint.ConstraintLayout>
 
@@ -142,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:background="#EEEEEE"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -171,15 +91,14 @@
 
         <TextView
             android:id="@+id/txt_agente"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_above="@+id/txt_level_voluntario"
             android:layout_centerHorizontal="true"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Guarda Municipal"
+            android:text="Voluntário"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="@+id/txt_nome_usuario"
@@ -199,9 +118,9 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/progress_level_voluntario"
+            app:layout_constraintHorizontal_bias="0.49"
             app:layout_constraintStart_toStartOf="@+id/progress_level_voluntario"
-            app:layout_constraintTop_toBottomOf="@+id/progress_level_voluntario"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/progress_level_voluntario" />
 
         <ImageView
             android:id="@+id/img_avatar"
@@ -217,22 +136,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/ic_bombeiro" />
+            app:srcCompat="@drawable/ic_voluntario" />
 
         <ProgressBar
             android:id="@+id/progress_level_voluntario"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="150dp"
             android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:progress="10"
             app:layout_constraintEnd_toEndOf="@+id/txt_nome_usuario"
+            app:layout_constraintHorizontal_bias="0.456"
             app:layout_constraintStart_toStartOf="@+id/txt_nome_usuario"
             app:layout_constraintTop_toBottomOf="@+id/txt_agente" />
 
         <ImageView
-            android:id="@+id/img_level_agente"
+            android:id="@+id/img_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -241,9 +162,9 @@
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/img_avatar"
+            app:layout_constraintHorizontal_bias="0.4"
             app:layout_constraintStart_toStartOf="@+id/img_avatar"
             app:layout_constraintTop_toBottomOf="@+id/img_avatar"
-            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/ic_level1" />
 
 

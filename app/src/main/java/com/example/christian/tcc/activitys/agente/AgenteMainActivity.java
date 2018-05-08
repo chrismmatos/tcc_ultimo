@@ -16,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,14 +33,9 @@ import android.widget.Toast;
 import com.example.christian.tcc.R;
 import com.example.christian.tcc.activitys.LoginAct;
 import com.example.christian.tcc.activitys.PreferenciasActivity;
-import com.example.christian.tcc.activitys.pdi.PdiAcompActivity;
-import com.example.christian.tcc.activitys.pdi.PdiMainActivity;
 import com.example.christian.tcc.config.ChecaSegundoPlano;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
-import com.example.christian.tcc.config.CustomFirebaseInstanceIDService;
-import com.example.christian.tcc.config.MyFirebaseMessagingService;
 import com.example.christian.tcc.helper.Notificacao;
-import com.example.christian.tcc.helper.Preferencias;
 import com.example.christian.tcc.modelo.PedidoAcompanhamento;
 import com.example.christian.tcc.modelo.Usuario;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,7 +49,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -66,7 +59,6 @@ import okhttp3.OkHttpClient;
 
 import static com.example.christian.tcc.activitys.LoginAct.mRootRef;
 import static com.example.christian.tcc.activitys.LoginAct.usuarioLogado;
-import static com.example.christian.tcc.helper.Notificacao.sendNotification;
 
 public class AgenteMainActivity extends AppCompatActivity {
     OkHttpClient mClient = new OkHttpClient();
@@ -97,6 +89,7 @@ public class AgenteMainActivity extends AppCompatActivity {
     private Usuario usuario;
     static public AlertDialog alerta;
     private MyCountDownTimer timer;
+    private ImageView imgLevel;
 
 
     @Override
@@ -109,17 +102,18 @@ public class AgenteMainActivity extends AppCompatActivity {
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
         refUsers = ConfiguracaoFirebase.getFirebaseDatabase().child("usuarios");
 
+        imgLevel = (ImageView) findViewById(R.id.img_level_agente);
         btnSolicitarApoio = (Button) findViewById(R.id.btn_solicitar_apoio);
-        btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos);
+        btnReceberPedidos = (Button) findViewById(R.id.btn_receber_pedidos_voluntario);
         btnMapearAgente = (Button) findViewById(R.id.btn_mapear_agentes);
         spnTipoAgente     = (Spinner) findViewById(R.id.spinner_agente);
-        txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos);
+        txtReceberPedidos = (TextView) findViewById(R.id.txt_receber_pedidos_voluntario);
         txtMapearAgentes = (TextView) findViewById(R.id.txt_mapear);
-        txtNome = (TextView) findViewById(R.id.txt_nome);
+        txtNome = (TextView) findViewById(R.id.txt_nome_usuario);
         txtTipoAgente = (TextView) findViewById(R.id.txt_agente);
         txtApoio = (TextView) findViewById(R.id.txt_apoio);
-        txtLevel = (TextView) findViewById(R.id.txt_level);
-        progressBar = (ProgressBar) findViewById(R.id.progress_level);
+        txtLevel = (TextView) findViewById(R.id.txt_level_voluntario);
+        progressBar = (ProgressBar) findViewById(R.id.progress_level_voluntario);
         imgAvatar = (ImageView) findViewById(R.id.img_avatar);
         txtApoio.setText("Selecione uma categoria de agentes para solicitar um apoio.");
         txtMapearAgentes.setText("Encontre agentes próximos.");
@@ -162,20 +156,42 @@ public class AgenteMainActivity extends AppCompatActivity {
         switch (usuarioLogado.getTipoAgente()){
             case "Guarda Municipal":
                 imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_guarda));
+                FirebaseMessaging.getInstance().subscribeToTopic("guarda");
                 break;
             case "Agente de Defesa Civil":
                 imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_defesa_civil));
+                FirebaseMessaging.getInstance().subscribeToTopic("defesa");
                 break;
             case "Policial Militar":
                 imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_polical));
+                FirebaseMessaging.getInstance().subscribeToTopic("bm");
                 break;
             case "Bombeiro":
                 imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_bombeiro));
+                FirebaseMessaging.getInstance().subscribeToTopic("bombeiro");
                 break;
 
                 default:
                     imgAvatar.setImageDrawable(getDrawable(R.drawable.ic_saude));
+                    FirebaseMessaging.getInstance().subscribeToTopic("samu");
         }
+
+        if(usuarioLogado.getLevel()>20)
+            imgLevel.setImageResource(R.drawable.ic_level8);
+        else if(usuarioLogado.getLevel()>17)
+            imgLevel.setImageResource(R.drawable.ic_level7);
+             else if(usuarioLogado.getLevel()>14)
+                    imgLevel.setImageResource(R.drawable.ic_level6);
+                else if(usuarioLogado.getLevel()>11)
+                        imgLevel.setImageResource(R.drawable.ic_level5);
+                    else if(usuarioLogado.getLevel()>8)
+                        imgLevel.setImageResource(R.drawable.ic_level4);
+                        else if(usuarioLogado.getLevel()>5)
+                            imgLevel.setImageResource(R.drawable.ic_level3);
+                            else if(usuarioLogado.getLevel()>2)
+                                imgLevel.setImageResource(R.drawable.ic_level2);
+                                else  imgLevel.setImageResource(R.drawable.ic_level1);
+
         txtTipoAgente.setText(usuarioLogado.getTipoAgente());
         txtNome.setText(usuarioLogado.getNome());
         txtLevel.setText("Level "+ usuarioLogado.getLevel());
@@ -291,7 +307,6 @@ public class AgenteMainActivity extends AppCompatActivity {
                     usuario = usuarioSnapshot.getValue(Usuario.class);
                     if(!usuarioLogado.getId().equals(usuario.getId()))
                         Notificacao.sendNotification(usuario.getToken(), dataNotification);
-
                 }
             }
             @Override
@@ -310,8 +325,9 @@ public class AgenteMainActivity extends AppCompatActivity {
                 usuarioLogado.setToken(token);
                 usuarioLogado.setOnline(true);
                 usuarioLogado.salvar();
+                carregaDados();
             }
-            FirebaseMessaging.getInstance().subscribeToTopic("agente");
+
             btnReceberPedidos.setText("DESATIVAR PEDIDOS");
             txtReceberPedidos.setText("Disponível para receber pedidos.");
             btnReceberPedidos.setBackground(getResources().getDrawable(R.drawable.selector_button_concluir));
@@ -319,6 +335,11 @@ public class AgenteMainActivity extends AppCompatActivity {
         }
         else {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("defesa");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("guarda");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("samu");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("bm");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("bombeiro");
             usuarioLogado.setToken("");
             usuarioLogado.setOnline(false);
             usuarioLogado.salvar();
@@ -346,6 +367,11 @@ public class AgenteMainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
             FirebaseMessaging.getInstance().unsubscribeFromTopic("agente");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("defesa");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("guarda");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("samu");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("bm");
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("bombeiro");
             usuarioLogado.setToken("");
             usuarioLogado.setOnline(false);
             usuarioLogado.salvar();

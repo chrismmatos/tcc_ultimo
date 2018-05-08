@@ -65,6 +65,7 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
     private DatabaseReference refPedido;
     private ValueEventListener eventListener;
     private Usuario usuarioAcompanhado;
+    private String descricaoPedido;
 
 
     private boolean SOLICITACAO_APOIO;
@@ -82,7 +83,9 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
             pedidoAtual = (PedidoAcompanhamento) getIntent().getSerializableExtra("pedido");
             caminho = "usuarios/"+pedidoAtual.getAcompanhante();
             SOLICITACAO_APOIO = true;
-        } else  { caminho = "usuarios/"+pedidoAtual.getUsuario();}
+        } else  {
+            caminho = "usuarios/"+pedidoAtual.getUsuario();
+        }
         refUser = refUser.child(caminho);
 
         tvData = (TextView) findViewById(R.id.tv_data);
@@ -164,8 +167,18 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
                                 usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") está em deslocamento.");
                     }
                     else{
-                    tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
-                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") está sem mobilidade e precisa de ajuda!");}
+
+                        switch (pedidoAtual.getTipo()){
+                            case "Acompanhamento":
+                                descricaoPedido = "está precisando de ajuda";
+                                break;
+                            default:
+                                descricaoPedido = "está precisando de reforço!";
+                                break;
+                        }
+
+                     tvDescricao.setText(usuarioAcompanhado.getNome()+ " (" +
+                            usuarioAcompanhado.getTipoPCD() +usuarioAcompanhado.getTipoAgente()+ ") " +descricaoPedido);}
 
                     tvDistancia.setText(df.format(distancia) + " metros");
 
@@ -397,7 +410,12 @@ public class AgenteAcompActivity extends FragmentActivity implements OnMapReadyC
         }
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Localização da solicitação");
+        if(SOLICITACAO_APOIO)
+            markerOptions.title("Localização do agente em deslocamento");
+
+        else
+            markerOptions.title("Localização da solicitação");
+
         markerOptions.snippet(usuarioAcompanhado.getNome() + " ("+ usuarioAcompanhado.getTipoPCD() + usuarioAcompanhado.getTipoAgente()+")");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         userLocationMaker = mMap.addMarker(markerOptions);

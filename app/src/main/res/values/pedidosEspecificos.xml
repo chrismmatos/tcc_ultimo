@@ -2,7 +2,7 @@
 <resources>
     <string-array name = "pae">
 
-        <item>Selecione uma opção</item>
+        <item>-Selecione uma opção-</item>
         <item>Sozinho em local com pouca iluminação</item>
         <item>Mal estar/ Mal súbito</item>
         <item>Falta de mobilidade</item>

@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.christian.tcc.R;
+import com.example.christian.tcc.VoluntarioActivity;
 import com.example.christian.tcc.activitys.agente.AgenteMainActivity;
 import com.example.christian.tcc.activitys.pdi.PdiMainActivity;
 import com.example.christian.tcc.config.ConfiguracaoFirebase;
@@ -193,6 +194,14 @@ public class LoginAct extends AppCompatActivity implements LoaderCallbacks<Curso
 
                         case "Idoso": {
                             startActivity(new Intent(LoginAct.this, PdiMainActivity.class));
+                            Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
+                            showProgress(false);
+                            finish();
+                            break;
+                        }
+
+                        case "Voluntário": {
+                            startActivity(new Intent(LoginAct.this, VoluntarioActivity.class));
                             Toast.makeText(getApplicationContext(), "Bem vindo de volta " + usuarioLogado.getEmail() + "!", Toast.LENGTH_LONG).show();
                             showProgress(false);
                             finish();

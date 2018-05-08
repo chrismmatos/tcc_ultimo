@@ -21,8 +21,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +80,11 @@ public class PdiMainActivity extends AppCompatActivity {
     private  DatabaseReference refPedido;
     private String SENDER_ID = "cU1VUF5EAms:APA91bFH7WQ7dYJGmmM16aRjCUmBMPzA28OT9R8VTI5Z2O6sekFXOR9CuHli0C-qZkEpPm-vWgJYGayDuuzdxAUh4pkZ1hVu9na2CV2dTheL81FyBWm6uzyq0gQujwIPdkJBgSI8r9R7";
     private MyCountDownTimer timer;
+    private TextView txtNome;
+    private String topic;
+    private Spinner spnPAE;
+    private String paeSelecionado;
+    private String tipoUsuario;
 
 
     @Override
@@ -85,11 +92,15 @@ public class PdiMainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdi_main);
 
+        spnPAE = (Spinner)findViewById(R.id.spinnerPAE);
+        txtNome = (TextView) findViewById(R.id.txt_nome_usuario);
         mAuth = ConfiguracaoFirebase.getFirebaseAutenticacao();
         btnPa = (Button)findViewById(R.id.btn_solicitarPA);
         btnPa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                topic = "voluntario";
+                tipoUsuario = "voluntários";
                 enviaPa();
             }
         });
@@ -97,10 +108,47 @@ public class PdiMainActivity extends AppCompatActivity {
         btnPae.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tipoUsuario = "agentes";
                 enviaPa();
             }
         });
+        txtNome.setText(usuarioLogado.getNome());
 
+        spnPAE.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                paeSelecionado = spnPAE.getSelectedItem().toString();
+
+                switch (paeSelecionado){
+                    case("Sozinho em local com pouca iluminação"):
+                        topic = "guarda";
+                        break;
+
+                    case("Mal estar/ Mal súbito"):
+                        topic = "samu";
+                        break;
+
+                    case("Falta de mobilidade"):
+                        topic = "samu";
+                        break;
+
+                    case("Perda de memória"):
+                        topic = "guarda";
+                        break;
+
+                    case("Local com alagamento"):
+                        topic = "defesa";
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -117,7 +165,7 @@ public class PdiMainActivity extends AppCompatActivity {
         //inflamos o layout alerta.xml na view
         View view = li.inflate(R.layout.dialog_layout, null);
         TextView textView = view.findViewById(R.id.tv_timer);
-        timer = new MyCountDownTimer(this, textView,  TEMPO_ESPERA *60*1000, 1000);
+        timer = new MyCountDownTimer(this, textView,  TEMPO_ESPERA *60*1000, 1000, tipoUsuario);
         timer.start();
         //definimos para o botão do layout um clickListener
         view.findViewById(R.id.btn_cancelar).setOnClickListener(new View.OnClickListener() {
@@ -168,7 +216,6 @@ public class PdiMainActivity extends AppCompatActivity {
     }
 
     public void enviaPa()  {
-        String token = "";
 
         pedido = new PedidoAcompanhamento();
         String idPedido = mRootRef.child("pedidos").push().getKey();
@@ -202,7 +249,7 @@ public class PdiMainActivity extends AppCompatActivity {
                 if(dataSnapshot.getValue()!=null) {
                     DataSnapshot child = dataSnapshot.getChildren().iterator().next();
                     Usuario usuarioNotificado = child.getValue(Usuario.class);
-                    sendNotification("/topics/agente",dataNotification);
+                    sendNotification("/topics/"+ topic ,dataNotification);
 
                 }
 
@@ -378,9 +425,11 @@ public class PdiMainActivity extends AppCompatActivity {
         private TextView tv;
         private Context context;
         private long timerInTure;
+        private String tipoUsuario;
 
-        public MyCountDownTimer(Context context, TextView tv, long millisInFuture, long countDownInterval) {
+        public MyCountDownTimer(Context context, TextView tv, long millisInFuture, long countDownInterval, String tipoUsuario) {
             super(millisInFuture, countDownInterval);
+            this.tipoUsuario = tipoUsuario;
             this.context = context;
             this.tv = tv;
         }
@@ -388,14 +437,14 @@ public class PdiMainActivity extends AppCompatActivity {
         @Override
         public void onTick(long millisUntilFinished) {
             timerInTure = millisUntilFinished;
-            tv.setText( "Procurando agentes próximos...\n"
+            tv.setText( "Procurando " +tipoUsuario +    " próximos...\n"
                     +getCorrectTimer(true, millisUntilFinished)+ ":" + getCorrectTimer(false, millisUntilFinished) );
         }
 
         @Override
         public void onFinish() {
             timerInTure -= 1000;
-            tv.setText( "Procurando agentes próximos...\n"
+            tv.setText( "Procurando " +tipoUsuario +    " próximos ...\n"
                     +getCorrectTimer(true, timerInTure)+ ":" + getCorrectTimer(false, timerInTure) );
             alerta.dismiss();
             cancelaPedido();
