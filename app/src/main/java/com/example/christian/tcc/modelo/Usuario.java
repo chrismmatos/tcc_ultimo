@@ -7,12 +7,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
 /**
  * Created by christian on 11/03/2018.
  */
-
 
 public class Usuario implements Serializable {
     private String id = "";
@@ -25,8 +22,53 @@ public class Usuario implements Serializable {
     private Double latitude = 0.0;
     private Double longitude = 0.0;
     private String token = null;
+    public boolean deficienciaMental = false;
+    public boolean deficienciaMotora = false;
+    public boolean deficienciaAuditiva = false;
+    public boolean deficienciaVisual = false;
+    public boolean deficienciaCadeirante = false;
     private boolean online = false;
     public String vtr = null;
+
+    public boolean isDeficienciaMental() {
+        return deficienciaMental;
+    }
+
+    public void setDeficienciaMental(boolean deficienciaMental) {
+        this.deficienciaMental = deficienciaMental;
+    }
+
+    public boolean isDeficienciaMotora() {
+        return deficienciaMotora;
+    }
+
+    public void setDeficienciaMotora(boolean deficienciaMotora) {
+        this.deficienciaMotora = deficienciaMotora;
+    }
+
+    public boolean isDeficienciaAuditiva() {
+        return deficienciaAuditiva;
+    }
+
+    public void setDeficienciaAuditiva(boolean deficienciaAuditiva) {
+        this.deficienciaAuditiva = deficienciaAuditiva;
+    }
+
+    public boolean isDeficienciaVisual() {
+        return deficienciaVisual;
+    }
+
+    public void setDeficienciaVisual(boolean deficienciaVisual) {
+        this.deficienciaVisual = deficienciaVisual;
+    }
+
+    public boolean isDeficienciaCadeirante() {
+        return deficienciaCadeirante;
+    }
+
+    public void setDeficienciaCadeirante(boolean deficienciaCadeirante) {
+        this.deficienciaCadeirante = deficienciaCadeirante;
+    }
 
     public Usuario(){ }
 
